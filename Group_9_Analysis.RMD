@@ -5,11 +5,10 @@ date: "3/7/2022"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
+```{r libraries, echo = FALSE}
 
-```{r, echo = FALSE}
+#Load necessary libraries for the data exploration and analysis
+
 library(tidyverse)
 library(moderndive)
 library(skimr)
@@ -19,8 +18,235 @@ library(broom)
 library(olsrr)
 ```
 
-# data cleaning: remove the missing data
+```{r import, echo = FALSE}
 
-```{r, echo = FALSE}
+#Read in data from github and abbreviate certain country names.
+
 analysis <- read_csv("https://raw.githubusercontent.com/brent-strong/DAS2022-Group-09/main/dataset9.csv")
+
+glimpse(analysis)
+
+for(i in 1:nrow(analysis)){
+  if(str_detect(analysis$country_of_origin[i], "Puerto Rico")){
+    analysis$country_of_origin[i] <- "Puerto Rico"
+  }
+  if(str_detect(analysis$country_of_origin[i], "Hawaii")){
+    analysis$country_of_origin[i] <- "Hawaii"
+  }
+  if(str_detect(analysis$country_of_origin[i], "Tanzania")){
+    analysis$country_of_origin[i] <- "Tanzania"
+  }
+  else{
+    analysis$country_of_origin[i] <- analysis$country_of_origin[i]
+  }
+}
+
+View(analysis)
+
 ```
+
+```{r import, echo = FALSE}
+
+glimpse(analysis)
+
+#Use the skim function but separate out altitude_mean_meters and harvested in order to make the tables easier to read.
+
+analysis %>%
+  select(-altitude_mean_meters, -harvested) %>%
+  skim_without_charts()
+
+analysis %>%
+  select(altitude_mean_meters, harvested) %>%
+  skim_without_charts()
+
+#Examine the proportion of batches that are good:
+
+mean(analysis$Qualityclass=="Good")
+```
+
+```{r aroma, echo = FALSE}
+
+glimpse(analysis)
+
+#Generate histogram to visualize aroma data.
+
+ggplot(data = analysis, mapping = aes(x = aroma)) +
+  geom_histogram()
+
+#Generate boxplot to visualize aroma data.
+
+ggplot(data = analysis, mapping = aes(y = aroma)) +
+  geom_boxplot()
+
+#Single observation with a value of 0 is odd. 
+
+```
+
+```{r flavor, echo = FALSE}
+
+glimpse(analysis)
+
+#Generate histogram to visualize flavor data.
+
+ggplot(data = analysis, mapping = aes(x = flavor)) +
+  geom_histogram()
+
+#Generate boxplot to visualize flavor data.
+
+ggplot(data = analysis, mapping = aes(y = flavor)) +
+  geom_boxplot()
+
+#Single observation with a value of 0 is odd. 
+
+```
+
+```{r acidity, echo = FALSE}
+
+glimpse(analysis)
+
+#Generate histogram to visualize acidity data.
+
+ggplot(data = analysis, mapping = aes(x = acidity)) +
+  geom_histogram()
+
+#Generate boxplot to visualize acidity data.
+
+ggplot(data = analysis, mapping = aes(y = acidity)) +
+  geom_boxplot()
+
+#Single observation with a value of 0 is odd. See if this same observation has a value of 0 for flavor and aroma as well. 
+
+analysis %>% 
+  filter(acidity == 0 & flavor == 0 & aroma == 0)
+
+```
+
+```{r category_two_defects, echo = FALSE}
+
+glimpse(analysis)
+
+#Generate histogram to visualize category_two_defects data.
+
+ggplot(data = analysis, mapping = aes(x = category_two_defects)) +
+  geom_histogram()
+
+#Generate boxplot to visualize category_two_defects data.
+
+ggplot(data = analysis, mapping = aes(y = category_two_defects)) +
+  geom_boxplot()
+```
+
+```{r altitude, echo = FALSE}
+
+glimpse(analysis)
+
+#Generate histogram to visualize altitude data.
+
+ggplot(data = analysis, mapping = aes(x = altitude_mean_meters)) +
+  geom_histogram()
+
+#Generate boxplot to visualize altitude data.
+
+ggplot(data = analysis, mapping = aes(y = altitude_mean_meters)) +
+  geom_boxplot()
+
+#Mt. Everest is only 8,849 meters tall. Remove any observations with altitudes higher than that.
+
+analysis2 <- analysis %>%
+  filter(altitude_mean_meters < 8849)
+
+#Generate histogram to visualize altitude data after removing implausuble observations.
+
+ggplot(data = analysis2, mapping = aes(x = altitude_mean_meters)) +
+  geom_histogram()
+
+#Generate boxplot to visualize altitude data after removing implausible observations.
+
+ggplot(data = analysis2, mapping = aes(y = altitude_mean_meters)) +
+  geom_boxplot()
+  
+```
+
+```{r harvested, echo = FALSE}
+
+glimpse(analysis)
+
+#Generate histogram to visualize year of harvest(harvested) data.
+
+ggplot(data = analysis, mapping = aes(x = harvested)) +
+  geom_histogram()
+
+#Generate boxplot to visualize year of harvest(harvested) data.
+
+ggplot(data = analysis, mapping = aes(y = harvested)) +
+  geom_boxplot()
+
+```
+
+```{r country, echo = FALSE}
+
+glimpse(analysis)
+
+#Create a new data set with the proportion of batches that were good and the number of observations.  
+
+analysis3 <- analysis %>%
+  mutate(Qualityclass_indicator = 0 + as.numeric(Qualityclass=="Good")) %>%
+  group_by(country_of_origin) %>%
+  summarize(proportion = mean(Qualityclass_indicator), n=n()) %>%
+  arrange(desc(proportion))
+View(analysis3)
+
+#Create a bar chart to visualize the proportion of batches that were good for each country. Split up the visualizations into four groups. 
+
+p1<-ggplot(data = analysis3[1:9,], mapping = aes(x = country_of_origin, y = proportion)) +
+  geom_col() + geom_text(data = analysis3[1:9,], aes(label = n), nudge_y=0.25)
+
+p2<-ggplot(data = analysis3[10:18,], mapping = aes(x = country_of_origin, y = proportion)) +
+  geom_col() + geom_text(data = analysis3[10:18,], aes(label = n), nudge_y=0.35)
+
+p3<-ggplot(data = analysis3[19:26,], mapping = aes(x = country_of_origin, y = proportion)) +
+  geom_col() + geom_text(data = analysis3[19:26,], aes(label = n), nudge_y=0.35)
+
+p4<-ggplot(data = analysis3[27:34,], mapping = aes(x = country_of_origin, y = proportion)) +
+  geom_col() + geom_text(data = analysis3[27:34,], aes(label = n), nudge_y=0.3)
+
+grid.arrange(p1, p2, p3, p4, nrow = 4)
+```
+
+```{r boxplots, echo = FALSE}
+
+glimpse(analysis)
+
+#Generate boxplot of aroma data by Qualityclass
+
+ggplot(data = analysis, mapping = aes(x=Qualityclass, y = aroma, fill=Qualityclass)) +
+  geom_boxplot()
+
+#Generate boxplot of flavor data by Qualityclass
+
+ggplot(data = analysis, mapping = aes(x=Qualityclass, y = flavor, fill=Qualityclass)) +
+  geom_boxplot()
+
+#Generate boxplot of acidity data by Qualityclass
+
+ggplot(data = analysis, mapping = aes(x=Qualityclass, y = acidity, fill=Qualityclass)) +
+  geom_boxplot()
+
+#Generate boxplot of category_two_defects data by Qualityclass
+
+ggplot(data = analysis, mapping = aes(x=Qualityclass, y = category_two_defects, fill=Qualityclass)) +
+  geom_boxplot()
+
+#Generate boxplot of altitude data by Qualityclass with implausible values removed.
+
+ggplot(data = analysis2, mapping = aes(x=Qualityclass, y = altitude_mean_meters, fill=Qualityclass)) +
+  geom_boxplot()
+
+#Generate boxplot of year of harvest (harvested) data by Qualityclass with implausible values removed.
+
+ggplot(data = analysis, mapping = aes(x=Qualityclass, y = harvested, fill=Qualityclass)) +
+  geom_boxplot()
+
+```
+
+
