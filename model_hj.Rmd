@@ -1,0 +1,55 @@
+---
+title: "G9_p2"
+author: "Hongjin Ren"
+date: "2022/3/10"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries}
+library(tidyverse)
+library(moderndive)
+library(skimr)
+library(kableExtra)
+library(gridExtra)
+library(broom)
+library(olsrr)
+library(gapminder)
+library(sjPlot)
+library(stats)
+library(jtools)
+```
+
+```{r}
+coffee <- read_csv("https://raw.githubusercontent.com/brent-strong/DAS2022-Group-09/main/dataset9.csv")
+```
+
+- country_of_origin – Country where the coffee bean originates from.
+- aroma – Aroma grade (ranging from 0-10)
+- flavor – Flavor grade (ranging from 0-10)
+- acidity – Acidity grade (ranging from 0-10)
+- category_two_defects – Count of category 2 type defects in the batch of coffee beans tested.
+- altitiude_mean_meters – Mean altitude of the growers farm (in metres)
+- harvested – Year the batch was harvested
+- Qualityclass – Quality score for the batch (Good - ≥ 82.5, Poor - <82.5). Note: 82.5
+was selected as the cut off as this is the median score for all the batches tested.
+
+```{r}
+co_Na <- na.omit(coffee)
+```
+
+```{r}
+cor(co_Na[2:6])
+```
+
+
+```{r}
+skim(coffee)
+cor(coffee[2:6])
+```
+
+
+
