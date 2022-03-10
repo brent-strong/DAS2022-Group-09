@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r libraries}
+```{r libraries,warning=FALSE}
 library(tidyverse)
 library(moderndive)
 library(skimr)
@@ -23,7 +23,7 @@ library(stats)
 library(jtools)
 ```
 
-```{r}
+```{r,warning=FALSE}
 coffee <- read_csv("https://raw.githubusercontent.com/brent-strong/DAS2022-Group-09/main/dataset9.csv")
 ```
 
@@ -47,9 +47,46 @@ cor(co_Na[2:6])
 
 
 ```{r}
-skim(coffee)
+library(ggplot2)
+library(GGally)
+ggpairs(co_Na, columns=2:6,aes(color=class))
 cor(coffee[2:6])
 ```
+
+
+
+
+#factor the respond data
+```{r}
+co_Na$class[co_Na$Qualityclass == "Poor"] <- 0
+co_Na$class[co_Na$Qualityclass == "Good"] <- 1
+co_Na$class <- factor(co_Na$class,
+                      levels = c(0,1),
+                      labels = c("Poor","Good"))
+
+```
+
+
+```{r,warning=FALSE}
+ggplot(data = co_Na, mapping = aes(x = aroma, y = Qualityclass)) + 
+  geom_point(alpha = 0.2) +
+  labs(x = "   ", y = "  ",
+       title = "The relationship of * and * in ") +
+  geom_smooth(method = 'glm',method.args = list(family = 'binomial'),se = F)
+
+```
+
+```{r,warning=FALSE}
+model_glm <- glm(class ~ aroma + flavor + acidity, data = co_Na,family = binomial(link = "logit"))
+summary(model_glm)
+
+```
+
+```{r}
+
+plot(model_glm)
+```
+
 
 
 
