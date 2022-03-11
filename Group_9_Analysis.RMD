@@ -119,6 +119,8 @@ ggplot(data = analysis, mapping = aes(y = acidity)) +
 analysis %>% 
   filter(acidity == 0 & flavor == 0 & aroma == 0)
 
+#Will delete the observation in the formal analysis. 
+
 ```
 
 ```{r category_two_defects, echo = FALSE}
@@ -134,6 +136,22 @@ ggplot(data = analysis, mapping = aes(x = category_two_defects)) +
 
 ggplot(data = analysis, mapping = aes(y = category_two_defects)) +
   geom_boxplot()
+
+#Apply log(x+1) transformation and then visualize the data set.
+
+analysis1 <- analysis %>%
+  mutate(defects_log = log(category_two_defects+1))
+
+#Generate histogram to visualize category_two_defects data after log-transformation.
+
+ggplot(data = analysis1, mapping = aes(x = defects_log)) +
+  geom_histogram()
+
+#Generate boxplot to visualize category_two_defects data after log-transformation.
+
+ggplot(data = analysis1, mapping = aes(y = defects_log)) +
+  geom_boxplot()
+
 ```
 
 ```{r altitude, echo = FALSE}
@@ -217,36 +235,26 @@ grid.arrange(p1, p2, p3, p4, nrow = 4)
 
 glimpse(analysis)
 
-#Generate boxplot of aroma data by Qualityclass
+#Create the final data set. Remove observations that have implausible values for at least one of the variables. Standardize aroma, flavor, acidity, and altitude. Apply a log(x+1) transformation to category_two_defects varaible. Turn Qualityclass into an indicator variable so that it can be used in the logistic regression analysis. Remove unneeded variables.
 
-ggplot(data = analysis, mapping = aes(x=Qualityclass, y = aroma, fill=Qualityclass)) +
-  geom_boxplot()
+coffee_final <- analysis %>%
+  filter(acidity != 0 & altitude_mean_meters < 8849 & !is.na(harvested)) %>%
+  mutate(aroma = scale(aroma), flavor=scale(flavor), acidity=scale(acidity), defects_log = log(category_two_defects + 1), altitude = scale(altitude_mean_meters), year = as.factor(harvested), Qualityclass = 0 + as.numeric(Qualityclass == "Good")) %>%
+  select(-altitude_mean_meters,-harvested,-category_two_defects)
 
-#Generate boxplot of flavor data by Qualityclass
+#View the final data set and make that the standardizations and transformation were appropriately applied.
 
-ggplot(data = analysis, mapping = aes(x=Qualityclass, y = flavor, fill=Qualityclass)) +
-  geom_boxplot()
+View(coffee_final)
+skim_without_charts(coffee_final)
 
-#Generate boxplot of acidity data by Qualityclass
+#Examine the number of observations by year.
 
-ggplot(data = analysis, mapping = aes(x=Qualityclass, y = acidity, fill=Qualityclass)) +
-  geom_boxplot()
-
-#Generate boxplot of category_two_defects data by Qualityclass
-
-ggplot(data = analysis, mapping = aes(x=Qualityclass, y = category_two_defects, fill=Qualityclass)) +
-  geom_boxplot()
-
-#Generate boxplot of altitude data by Qualityclass with implausible values removed.
-
-ggplot(data = analysis2, mapping = aes(x=Qualityclass, y = altitude_mean_meters, fill=Qualityclass)) +
-  geom_boxplot()
-
-#Generate boxplot of year of harvest (harvested) data by Qualityclass with implausible values removed.
-
-ggplot(data = analysis, mapping = aes(x=Qualityclass, y = harvested, fill=Qualityclass)) +
-  geom_boxplot()
+coffee_final %>%
+  group_by(year) %>%
+  summarize(n=n())
 
 ```
+
+
 
 
