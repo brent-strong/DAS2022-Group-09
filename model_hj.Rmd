@@ -21,6 +21,9 @@ library(gapminder)
 library(sjPlot)
 library(stats)
 library(jtools)
+library(MASS)
+library(janitor)
+library(ggplot2)
 ```
 
 ```{r,warning=FALSE}
@@ -54,8 +57,6 @@ cor(coffee[2:6])
 ```
 
 
-
-
 #factor the respond data
 ```{r}
 co_Na$class[co_Na$Qualityclass == "Poor"] <- 0
@@ -66,15 +67,47 @@ co_Na$class <- factor(co_Na$class,
 
 ```
 
-
-```{r,warning=FALSE}
-ggplot(data = co_Na, mapping = aes(x = aroma, y = Qualityclass)) + 
-  geom_point(alpha = 0.2) +
-  labs(x = "   ", y = "  ",
-       title = "The relationship of * and * in ") +
-  geom_smooth(method = 'glm',method.args = list(family = 'binomial'),se = F)
+```{r}
+coffee %>% 
+  tabyl(Qualityclass, country_of_origin) %>% 
+  adorn_percentages() %>% 
+  adorn_pct_formatting() %>% 
+  adorn_ns()
 
 ```
+
+```{r}
+coffee %>% 
+  tabyl(Qualityclass, harvested) %>% 
+  adorn_percentages() %>% 
+  adorn_pct_formatting() %>% 
+  adorn_ns()
+
+```
+
+
+
+```{r}
+ggplot(coffee, aes(x= harvested,  y = ..prop.., group=Qualityclass, fill=Qualityclass)) + 
+    geom_bar(position="dodge", stat="count") +
+    labs(y = "Proportion")
+
+```
+
+
+```{r}
+skim(co_Na)
+```
+
+
+I think we need to translate the num:year to chr:year
+```{r}
+co_Na$harvested <- as.character(co_Na$harvested)
+```
+
+
+
+#-------------------------------build model
 
 ```{r,warning=FALSE}
 model_glm <- glm(class ~ aroma + flavor + acidity, data = co_Na,family = binomial(link = "logit"))
@@ -82,11 +115,54 @@ summary(model_glm)
 
 ```
 
-```{r}
 
-plot(model_glm)
+```{r}
+model_test <- glm(class ~ aroma + flavor + acidity + country_of_origin + category_two_defects + altitude_mean_meters + harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_test)
+```
+
+```{r}
+model_year <- glm(class ~ harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_year)
+```
+
+
+```{r}
+model_country <- glm(class ~ country_of_origin, data = co_Na,family = binomial(link = "logit"))
+summary(model_country)
 ```
 
 
 
+```{r}
+stepAIC(model_glm, direction = 'both')
+```
+
+
+
+#--------------------------------test model
+
+```{r}
+
+pre <- predict(model_country,type='response')
+
+data <- data.frame(prob=pre,obs=co_Na$class)
+
+data <- data[order(data$prob),]
+n <- nrow(data)
+tpr <- fpr <- rep(0,n)
+
+for (i in 1:n) {
+    threshold <- data$prob[i]
+    tp <- sum(data$prob > threshold & data$obs == "Good")
+    fp <- sum(data$prob > threshold & data$obs == "Poor")
+    tn <- sum(data$prob < threshold & data$obs == "Poor")
+    fn <- sum(data$prob < threshold & data$obs == "Good")
+    tpr[i] <- tp/(tp+fn) # 真正率
+    fpr[i] <- fp/(tn+fp) # 假正率
+}
+plot(fpr,tpr,type='l')
+abline(a=0,b=1)
+
+```
 
