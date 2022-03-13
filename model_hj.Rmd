@@ -131,25 +131,76 @@ co_Na$harvested <- as.character(co_Na$harvested)
 
 #-------------------------------build model
 
-** Only base on the altitude **
+**Only base on the altitude**
 ```{r}
 model_level <- glm(class ~ level - 1, data = co_Na,family = binomial(link = "logit"))
 summary(model_level)
 
 ```
 
-** Base on the altitude and country **
+**Base on the harvested**
+```{r}
+model_year <- glm(class ~ harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_year)
+```
+
+**Base on the country**
+```{r}
+model_country <- glm(class ~ country_of_origin, data = co_Na,family = binomial(link = "logit"))
+summary(model_country)
+```
+
+According the result before, we choose some significant country as a class variable.
+```{r}
+co_Na$Colombia <- ifelse(co_Na$country_of_origin == 'Colombia',1,0)
+co_Na$Mexico <- ifelse(co_Na$country_of_origin == 'Mexico',1,0)
+co_Na$Honduras <- ifelse(co_Na$country_of_origin == 'Honduras',1,0)
+co_Na$Kenya <- ifelse(co_Na$country_of_origin == 'Kenya',1,0)
+
+```
+
+```{r}
+model_co_4 <- glm(class ~ Colombia + Mexico + Honduras + Kenya-1, data = co_Na,family = binomial(link = "logit"))
+summary(model_co_4)
+```
+
+**Base on the year and country**
+```{r}
+model_cn_ye <- glm(class ~ country_of_origin + harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_cn_ye)
+```
+
+**Base on the altitude and country**
 ```{r,warning=FALSE}
-model_al_co <- glm(class ~ level + country_of_origin, data = co_Na,family = binomial(link = "logit"))
+model_al_co <- glm(class ~ level + Colombia + Mexico + Honduras + Kenya, data = co_Na,family = binomial(link = "logit"))
 summary(model_al_co)
 
 ```
 
 
-```{r}
-model_test <- glm(class ~ aroma + flavor + acidity + country_of_origin + category_two_defects + altitude_mean_meters + harvested, data = co_Na,family = binomial(link = "logit"))
-summary(model_test)
+**Base on the 3**
+```{r,warning=FALSE}
+model_al_co <- glm(class ~ level + country_of_origin + harvested-1, data = co_Na,family = binomial(link = "logit"))
+summary(model_al_co)
 ```
+
+
+
+Colombia + Mexico + Honduras + Kenya
+
+
+**Consider everything**
+```{r}
+model_all <- glm(class ~ aroma + flavor + acidity + country_of_origin + category_two_defects + altitude_mean_meters + harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_all)
+```
+
+
+```{r}
+model_all_2 <- glm(class ~ aroma + flavor + acidity + Colombia + Mexico + Honduras + Kenya + category_two_defects + altitude_mean_meters + harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_all_2)
+```
+
 
 ```{r}
 model_test <- glm(class ~ aroma + flavor + acidity, data = co_Na,family = binomial(link = "logit"))
@@ -160,35 +211,25 @@ testdata
 ```
 
 
-```{r}
-model_year <- glm(class ~ harvested, data = co_Na,family = binomial(link = "logit"))
-summary(model_year)
-```
 
-
-```{r}
-model_country <- glm(class ~ country_of_origin, data = co_Na,family = binomial(link = "logit"))
-summary(model_country)
-```
-
-```{r}
-model_cn_ye <- glm(class ~ country_of_origin + harvested, data = co_Na,family = binomial(link = "logit"))
-summary(model_cn_ye)
-```
 
 
 
 ```{r}
-stepAIC(model_test, direction = 'both')
+stepAIC(model_all_2, direction = 'both')
 ```
 
+```{r}
+model_best <- glm(class ~ aroma + flavor + acidity + Colombia + Mexico + category_two_defects, data = co_Na,family = binomial(link = "logit"))
+summary(model_best)
 
+```
 
 #--------------------------------test model
 
 ```{r}
 
-pre <- predict(model_level,type='response')
+pre <- predict(model_best,type='response')
 
 data <- data.frame(prob=pre,obs=co_Na$class)
 
@@ -205,6 +246,7 @@ for (i in 1:n) {
     tpr[i] <- tp/(tp+fn) 
     fpr[i] <- fp/(tn+fp) 
 }
+
 plot(fpr,tpr,type='l')
 abline(a=0,b=1)
 
@@ -214,9 +256,13 @@ abline(a=0,b=1)
 Precision
 ```{r}
 TP <- sum(data$prob > 0.5 & data$obs == "Good")
-FP <- sum(data$prob > 0.5 & data$obs == "Poor")
+FP <- sum(data$prob >= 0.5 & data$obs == "Poor")
+TN <- sum(data$prob <= 0.5 & data$obs == "Poor")
+FN <- sum(data$prob < 0.5 & data$obs == "Good")
 Precision <- TP/(TP+FP)
+Accuracy <- (TP + TN)/(TP + TN + FP + FN)
 Precision
+Accuracy
 ```
 
 
