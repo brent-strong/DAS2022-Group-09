@@ -2,7 +2,10 @@
 title: "G9_p2"
 author: "Hongjin Ren"
 date: "2022/3/10"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
+bibliography: "D:/glasgow/git/Git hub/GitHub/DAS2022-Group-09/DAS.bib"
 ---
 
 ```{r setup, include=FALSE}
@@ -25,6 +28,7 @@ library(MASS)
 library(janitor)
 library(ROCR)
 library(ggplot2)
+library(GGally)
 ```
 
 ```{r,warning=FALSE}
@@ -62,14 +66,6 @@ cor(co_Na[2:6])
 ```
 
 
-```{r}
-library(ggplot2)
-library(GGally)
-ggpairs(co_Na, columns=2:6,aes(color=class))
-cor(coffee[2:6])
-```
-
-
 #factor the respond data
 ```{r}
 co_Na$class[co_Na$Qualityclass == "Poor"] <- 0
@@ -78,6 +74,24 @@ co_Na$class <- factor(co_Na$class,
                       levels = c(0,1),
                       labels = c("Poor","Good"))
 
+```
+
+
+
+##divide 3 levels for the altitude @hameed_coffee_2020
+```{r}
+co_Na$level_1 <- ifelse(co_Na$altitude_mean_meters<900,1,0)
+co_Na$level_2 <- ifelse(co_Na$altitude_mean_meters>=900 & co_Na$altitude_mean_meters<=1200,1,0)
+co_Na$level_3 <- ifelse(co_Na$altitude_mean_meters>1200,1,0)
+co_Na <- co_Na %>%
+  mutate(level = as.character(level_1 + level_2*2 + level_3*3))
+
+```
+
+
+```{r}
+ggpairs(co_Na, columns=2:6,aes(color=class))
+cor(coffee[2:6])
 ```
 
 ```{r}
@@ -101,16 +115,12 @@ coffee %>%
 
 
 ```{r}
-ggplot(coffee, aes(x= harvested,  y = ..prop.., group=Qualityclass, fill=Qualityclass)) + 
+ggplot(co_Na, aes(x= level,  y = ..prop.., group=class, fill=class)) + 
     geom_bar(position="dodge", stat="count") +
     labs(y = "Proportion")
 
 ```
 
-
-```{r}
-skim(co_Na)
-```
 
 
 I think we need to transform the num:year to chr:year
@@ -122,9 +132,19 @@ co_Na$harvested <- as.character(co_Na$harvested)
 
 #-------------------------------build model
 
+** Only base on the altitude **
+```{r}
+model_level <- glm(class ~ level - 1, data = co_Na,family = binomial(link = "logit"))
+summary(model_level)
+testdata <- co_Na[c(1:6),]
+testdata$prob <- predict(model_level,newdata = testdata,type = "response")
+testdata
+```
+
+** Base on the altitude and country **
 ```{r,warning=FALSE}
-model_glm <- glm(class ~ aroma + flavor + acidity, data = co_Na,family = binomial(link = "logit"))
-summary(model_glm)
+model_al_co <- glm(class ~ level + country_of_origin, data = co_Na,family = binomial(link = "logit"))
+summary(model_al_co)
 
 ```
 
@@ -135,8 +155,11 @@ summary(model_test)
 ```
 
 ```{r}
-model_test <- glm(class ~ aroma + flavor + acidity + country_of_origin + category_two_defects + altitude_mean_meters, data = co_Na,family = binomial(link = "logit"))
+model_test <- glm(class ~ aroma + flavor + acidity, data = co_Na,family = binomial(link = "logit"))
 summary(model_test)
+testdata <- co_Na[c(1:6),]
+testdata$prob <- predict(model_test,newdata = testdata,type = "response")
+testdata
 ```
 
 
@@ -168,7 +191,7 @@ stepAIC(model_test, direction = 'both')
 
 ```{r}
 
-pre <- predict(model_country,type='response')
+pre <- predict(model_level,type='response')
 
 data <- data.frame(prob=pre,obs=co_Na$class)
 
@@ -178,10 +201,10 @@ tpr <- fpr <- rep(0,n)
 
 for (i in 1:n) {
     threshold <- data$prob[i]
-    tp <- sum(data$prob > threshold & data$obs == "Good")
-    fp <- sum(data$prob > threshold & data$obs == "Poor")
-    tn <- sum(data$prob < threshold & data$obs == "Poor")
-    fn <- sum(data$prob < threshold & data$obs == "Good")
+    tp <- sum(data$prob > threshold & data$obs == 1)
+    fp <- sum(data$prob > threshold & data$obs == 0)
+    tn <- sum(data$prob < threshold & data$obs == 0)
+    fn <- sum(data$prob < threshold & data$obs == 1)
     tpr[i] <- tp/(tp+fn) # 真正率
     fpr[i] <- fp/(tn+fp) # 假正率
 }
@@ -192,10 +215,13 @@ abline(a=0,b=1)
 
 ```{r}
 pred <- prediction(pre,co_Na$class)
-performance(pred,'auc')@y.values #AUC值
-perf <- performance(pred,'fpr','tpr')
-plot(perf)
+performance(pred,'auc')@y.values
 ```
+
+
+#------------------
+
+
 
 
 
