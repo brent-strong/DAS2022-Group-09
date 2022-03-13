@@ -26,7 +26,6 @@ library(stats)
 library(jtools)
 library(MASS)
 library(janitor)
-library(ROCR)
 library(ggplot2)
 library(GGally)
 ```
@@ -136,9 +135,7 @@ co_Na$harvested <- as.character(co_Na$harvested)
 ```{r}
 model_level <- glm(class ~ level - 1, data = co_Na,family = binomial(link = "logit"))
 summary(model_level)
-testdata <- co_Na[c(1:6),]
-testdata$prob <- predict(model_level,newdata = testdata,type = "response")
-testdata
+
 ```
 
 ** Base on the altitude and country **
@@ -201,22 +198,28 @@ tpr <- fpr <- rep(0,n)
 
 for (i in 1:n) {
     threshold <- data$prob[i]
-    tp <- sum(data$prob > threshold & data$obs == 1)
-    fp <- sum(data$prob > threshold & data$obs == 0)
-    tn <- sum(data$prob < threshold & data$obs == 0)
-    fn <- sum(data$prob < threshold & data$obs == 1)
-    tpr[i] <- tp/(tp+fn) # 真正率
-    fpr[i] <- fp/(tn+fp) # 假正率
+    tp <- sum(data$prob > threshold & data$obs == "Good")
+    fp <- sum(data$prob > threshold & data$obs == "Poor")
+    tn <- sum(data$prob < threshold & data$obs == "Poor")
+    fn <- sum(data$prob < threshold & data$obs == "Good")
+    tpr[i] <- tp/(tp+fn) 
+    fpr[i] <- fp/(tn+fp) 
 }
 plot(fpr,tpr,type='l')
 abline(a=0,b=1)
 
 ```
 
+
+Precision
 ```{r}
-pred <- prediction(pre,co_Na$class)
-performance(pred,'auc')@y.values
+TP <- sum(data$prob > 0.5 & data$obs == "Good")
+FP <- sum(data$prob > 0.5 & data$obs == "Poor")
+Precision <- TP/(TP+FP)
+Precision
 ```
+
+
 
 
 #------------------
