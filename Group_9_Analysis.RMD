@@ -4,6 +4,9 @@ author: "Brent Strong, Enyu Li, Haotian Wang, Honjin Ren, Mu He"
 date: "3/7/2022"
 output: pdf_document
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, comment = NA, message = FALSE, warning = FALSE)
+```
 
 ```{r libraries, echo = FALSE}
 
@@ -54,15 +57,8 @@ for(i in 1:nrow(analysis)){
 ```
 
 ```{r , echo = FALSE}
-
 # glimpse(analysis)
-
-#Use the skim function but separate out altitude_mean_meters and harvested in order to make the tables easier to read.
-
-
-
 #Examine the proportion of batches that are good:
-
 mean(analysis$Qualityclass=="Good")
 ```
 
@@ -74,7 +70,7 @@ analysis %>%
   dplyr::select(-c(n_missing, complete_rate, skim_type)) %>%
   kable(col.names = c("Variable", "Mean", "SD", "Min.", "1st Q.", "Median",
                         "3rd Q.", "Max."), 
-        caption = 'Summary statistics of altitude mean meters and harvested.',
+        caption = 'Summary statistics of continuous variables.',
         booktabs = TRUE, format = "latex", digits = 2) %>%
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
@@ -91,7 +87,7 @@ my.analysis %>%
   transmute(country_of_origin=country_of_origin,
             number_of_batch=n,
             Proportion_of_good_quality=numeric.mean) %>%
-  kable(caption = '\\label{tab:countryskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable(caption = 'Number of batch and proportion of good quality by country of origin', booktabs = TRUE, linesep = "", digits = 2) %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
@@ -103,145 +99,116 @@ analysis %>%
   transmute(Variable=skim_variable, Qualityclass=Qualityclass, n=n, Mean=numeric.mean, SD=numeric.sd,
             Min=numeric.p0, Median=numeric.p50,  Max=numeric.p100,
             IQR = numeric.p75-numeric.p50) %>%
-  kable(caption = '\\label{tab:catskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable(caption = 'Summary statistics of continuous variables by quality of coffee', booktabs = TRUE, linesep = "", digits = 2) %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
-```{r aroma, echo = FALSE}
-
-# glimpse(analysis)
-
+```{r aroma, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for aroma.", fig.pos = 'H', message = FALSE}
 #Generate histogram to visualize aroma data.
-
-ggplot(data = analysis, mapping = aes(x = aroma)) +
+p1 <- ggplot(data = analysis, mapping = aes(x = aroma)) +
   geom_histogram()
-
 #Generate boxplot to visualize aroma data.
-
-ggplot(data = analysis, mapping = aes(y = aroma)) +
+p2 <- ggplot(data = analysis, mapping = aes(y = aroma)) +
   geom_boxplot()
-
-#Single observation with a value of 0 is odd. 
-
+grid.arrange(p1, p2, ncol = 2)
+#Single observation with a value of 0 is odd.
 ```
 
-```{r flavor, echo = FALSE}
-
-# glimpse(analysis)
-
+```{r flavor, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for flavor.", fig.pos = 'H', message = FALSE}
 #Generate histogram to visualize flavor data.
-
-ggplot(data = analysis, mapping = aes(x = flavor)) +
+p1 <- ggplot(data = analysis, mapping = aes(x = flavor)) +
   geom_histogram()
-
 #Generate boxplot to visualize flavor data.
-
-ggplot(data = analysis, mapping = aes(y = flavor)) +
+p2 <- ggplot(data = analysis, mapping = aes(y = flavor)) +
   geom_boxplot()
-
-# Single observation with a value of 0 is odd. 
-
+grid.arrange(p1, p2, ncol = 2)
+# Single observation with a value of 0 is odd.
 ```
 
-```{r acidity, echo = FALSE}
 
-# glimpse(analysis)
-
-# Generate histogram to visualize acidity data.
-
-ggplot(data = analysis, mapping = aes(x = acidity)) +
+```{r acidity, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for acidity.", fig.pos = 'H', message = FALSE}
+#Generate histogram to visualize acidity data.
+p1 <- ggplot(data = analysis, mapping = aes(x = acidity)) +
   geom_histogram()
-
-# Generate boxplot to visualize acidity data.
-
-ggplot(data = analysis, mapping = aes(y = acidity)) +
+#Generate boxplot to visualize acidity data.
+p2 <- ggplot(data = analysis, mapping = aes(y = acidity)) +
   geom_boxplot()
+grid.arrange(p1, p2, ncol = 2)
 
-# Single observation with a value of 0 is odd. See if this same observation has a value of 0 for flavor and aroma as well. 
-
+# Single observation with a value of 0 is odd. See if this same observation has a value of 0 for flavor and aroma as well.
 analysis %>% 
   filter(acidity == 0 & flavor == 0 & aroma == 0)
-
 #Will delete the observation in the formal analysis. 
 
 ```
 
-```{r category_two_defects, echo = FALSE}
-
-# glimpse(analysis)
-
-# Generate histogram to visualize category_two_defects data.
-
-ggplot(data = analysis, mapping = aes(x = category_two_defects)) +
+```{r category_two_defects, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for category two defects.", fig.pos = 'H', message = FALSE}
+#Generate histogram to visualize category_two_defects data.
+p1 <- ggplot(data = analysis, mapping = aes(x = category_two_defects)) +
   geom_histogram()
-
-# Generate boxplot to visualize category_two_defects data.
-
-ggplot(data = analysis, mapping = aes(y = category_two_defects)) +
+#Generate boxplot to visualize category_two_defects data.
+p2 <- ggplot(data = analysis, mapping = aes(y = category_two_defects)) +
   geom_boxplot()
+grid.arrange(p1, p2, ncol = 2)
+```
+
+Due to the right-skewed distribution of category_two_defects, log-transformation is applied.
+
+```{r category_two_defects2, echo = FALSE}
 
 # Apply log(x+1) transformation and then visualize the data set.
 
 analysis1 <- analysis %>%
   mutate(defects_log = log(category_two_defects+1))
- 
-# Generate histogram to visualize category_two_defects data after log-transformation.
-
-ggplot(data = analysis1, mapping = aes(x = defects_log)) +
-  geom_histogram()
-
-# Generate boxplot to visualize category_two_defects data after log-transformation.
-
-ggplot(data = analysis1, mapping = aes(y = defects_log)) +
-  geom_boxplot()
-
 ```
 
-```{r altitude, echo = FALSE}
-
-# glimpse(analysis)
-
-# Generate histogram to visualize altitude data.
-
-ggplot(data = analysis, mapping = aes(x = altitude_mean_meters)) +
+``` {r category_two_defects3, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for category two defects after log transformation.", fig.pos = 'H', message = FALSE}
+# Generate histogram to visualize category_two_defects data after log-transformation.
+p1 <- ggplot(data = analysis1, mapping = aes(x = defects_log)) +
   geom_histogram()
-
-# Generate boxplot to visualize altitude data.
-
-ggplot(data = analysis, mapping = aes(y = altitude_mean_meters)) +
+# Generate boxplot to visualize category_two_defects data after log-transformation.
+p2 <- ggplot(data = analysis1, mapping = aes(y = defects_log)) +
   geom_boxplot()
+grid.arrange(p1, p2, ncol = 2)
+```
+
+``` {r , echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for altitude.", fig.pos = 'H', message = FALSE}
+# Generate histogram to visualize category_two_defects data after log-transformation.
+p1 <- ggplot(data = analysis, mapping = aes(x = altitude_mean_meters)) +
+  geom_histogram()
+# Generate boxplot to visualize category_two_defects data after log-transformation.
+p2 <- ggplot(data = analysis, mapping = aes(y = altitude_mean_meters)) +
+  geom_boxplot()
+grid.arrange(p1, p2, ncol = 2)
+```
+Mt. Everest is only 8,849 meters tall. Remove any observations with altitudes higher than that.
+
+```{r altitude1, echo = FALSE}
 
 # Mt. Everest is only 8,849 meters tall. Remove any observations with altitudes higher than that.
 
 analysis2 <- analysis %>%
   filter(altitude_mean_meters < 8849)
-
-# Generate histogram to visualize altitude data after removing implausuble observations.
-
-ggplot(data = analysis2, mapping = aes(x = altitude_mean_meters)) +
-  geom_histogram()
-
-# Generate boxplot to visualize altitude data after removing implausible observations.
-
-ggplot(data = analysis2, mapping = aes(y = altitude_mean_meters)) +
-  geom_boxplot()
-  
 ```
 
-```{r harvested, echo = FALSE}
-
-# glimpse(analysis)
-
-# Generate histogram to visualize year of harvest(harvested) data.
-
-ggplot(data = analysis, mapping = aes(x = harvested)) +
+``` {r altitude2, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for altitude after removing implausuble observations.", fig.pos = 'H', message = FALSE}
+# Generate histogram to visualize category_two_defects data after log-transformation.
+p1 <- ggplot(data = analysis2, mapping = aes(x = altitude_mean_meters)) +
   geom_histogram()
-
-# Generate boxplot to visualize year of harvest(harvested) data.
-
-ggplot(data = analysis, mapping = aes(y = harvested)) +
+# Generate boxplot to visualize category_two_defects data after log-transformation.
+p2 <- ggplot(data = analysis2, mapping = aes(y = altitude_mean_meters)) +
   geom_boxplot()
+grid.arrange(p1, p2, ncol = 2)
+```
 
+``` {r harvested, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for harvested.", fig.pos = 'H', message = FALSE}
+# Generate histogram to visualize category_two_defects data after log-transformation.
+p1 <- ggplot(data = analysis, mapping = aes(x = harvested)) +
+  geom_histogram()
+# Generate boxplot to visualize category_two_defects data after log-transformation.
+p2 <- ggplot(data = analysis, mapping = aes(y = harvested)) +
+  geom_boxplot()
+grid.arrange(p1, p2, ncol = 2)
 ```
 
 ```{r country, echo = FALSE}
