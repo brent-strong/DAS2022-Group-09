@@ -26,6 +26,7 @@ library(MASS)
 library(janitor)
 library(ggplot2)
 library(caret)
+library(lme4)
 ```
 
 ```{r import, echo = FALSE}
@@ -376,13 +377,16 @@ stepAIC(model_all_3, direction = 'both')
 
 ```{r}
 
-#Fit the best logistic regression model.
+#Fit the best logistic regression model (same one was found using both approaches) to all available data. Missingness is not an issue because altitude and year are dropped. 
 
 model_best <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log, data = coffee_final,family = binomial(link = "logit"))
 summary(model_best)
 ```
 
 ```{r}
+
+#Use 10-fold cross-validation to assess the predictive performance of the model. 
+
 set.seed(50)
 folds <- createFolds(y=coffee_final$Qualityclass, k=10)
 accuracy <- as.numeric()
@@ -397,6 +401,30 @@ for(i in 1:10){
 mean(accuracy)
 ```
 
+```{r}
 
+#Fit a generalized linear mixed model with a random intercept for country as a sensitivity analysis. 
+
+model_glmm <- glmer(Qualityclass ~ 1 + aroma + flavor + acidity + defects_log + (1|country_of_origin), data = coffee_final,family = binomial(link = "logit"))
+summary(model_glmm, corr=FALSE)
+```
+
+```{r}
+
+#Use 10-fold cross-validation to assess the predictive performance of the model when country indicators are not included. 
+
+set.seed(50)
+folds <- createFolds(y=coffee_final$Qualityclass, k=10)
+accuracy <- as.numeric()
+for(i in 1:10){
+  fold_test <- coffee_final[folds[[i]],]
+  fold_train <- coffee_final[-folds[[i]],]
+  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + defects_log,family = binomial(link = logit), data =fold_train)
+  fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
+  fold_predict <- ifelse(fold_predict >= 0.5, 1, 0)
+  accuracy[i] <- mean(fold_predict == fold_test[,8])
+}
+mean(accuracy)
+```
 
 
