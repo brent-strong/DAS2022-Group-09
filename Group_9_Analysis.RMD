@@ -388,6 +388,8 @@ summary(model_best)
 set.seed(9)
 folds <- createFolds(y=coffee_final$Qualityclass, k=10)
 accuracy <- as.numeric()
+sensitivity <- as.numeric()
+specificity <- as.numeric()
 for(i in 1:10){
   fold_test <- coffee_final[folds[[i]],]
   fold_train <- coffee_final[-folds[[i]],]
@@ -395,8 +397,14 @@ for(i in 1:10){
   fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
   fold_predict <- ifelse(fold_predict >= 0.5, 1, 0)
   accuracy[i] <- mean(fold_predict == fold_test[,8])
+  sensitivity[i] <- sum(fold_predict + fold_test[,8] == 2) / sum(fold_test[,8] == 1)
+  specificity[i] <- sum(fold_predict + fold_test[,8] == 0) / sum(fold_test[,8] == 0)
 }
 mean(accuracy)
+
+mean(sensitivity)
+
+mean(specificity)
 ```
 
 
