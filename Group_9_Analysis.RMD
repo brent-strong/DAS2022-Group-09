@@ -59,13 +59,7 @@ for(i in 1:nrow(analysis)){
 
 #Use the skim function but separate out altitude_mean_meters and harvested in order to make the tables easier to read.
 
-analysis %>%
-  dplyr::select(-altitude_mean_meters, -harvested) %>%
-  skim_without_charts()
 
-analysis %>%
-  dplyr::select(altitude_mean_meters, harvested) %>%
-  skim_without_charts()
 
 #Examine the proportion of batches that are good:
 
@@ -307,7 +301,7 @@ coffee_final <- coffee_final %>%
 
 glimpse(coffee_final)
 # View(coffee_final)
-skim_without_charts(coffee_final)
+#skim_without_charts(coffee_final)
 
 #Examine the number of observations by year.
 
