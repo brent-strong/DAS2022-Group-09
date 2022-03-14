@@ -53,23 +53,64 @@ for(i in 1:nrow(analysis)){
 
 ```
 
-```{r import, echo = FALSE}
+```{r , echo = FALSE}
 
 # glimpse(analysis)
 
 #Use the skim function but separate out altitude_mean_meters and harvested in order to make the tables easier to read.
 
 analysis %>%
-  select(-altitude_mean_meters, -harvested) %>%
+  dplyr::select(-altitude_mean_meters, -harvested) %>%
   skim_without_charts()
 
 analysis %>%
-  select(altitude_mean_meters, harvested) %>%
+  dplyr::select(altitude_mean_meters, harvested) %>%
   skim_without_charts()
 
 #Examine the proportion of batches that are good:
 
 mean(analysis$Qualityclass=="Good")
+```
+
+```{r, echo=FALSE, eval = TRUE}
+my_skim2 <- skim_with(numeric = sfl(hist = NULL))
+analysis %>%
+  dplyr::select(-country_of_origin, -Qualityclass) %>%
+  my_skim2() %>%
+  dplyr::select(-c(n_missing, complete_rate, skim_type)) %>%
+  kable(col.names = c("Variable", "Mean", "SD", "Min.", "1st Q.", "Median",
+                        "3rd Q.", "Max."), 
+        caption = 'Summary statistics of altitude mean meters and harvested.',
+        booktabs = TRUE, format = "latex", digits = 2) %>%
+  kable_styling(font_size = 9, latex_options = "HOLD_position")
+```
+
+```{r, eval = TRUE}
+my_skim <- skim_with(base = sfl(n = length))
+my.analysis <- analysis %>%
+  mutate(Qualityclassindicator = as.numeric(Qualityclass=="Good"))
+my.analysis %>%
+  group_by(country_of_origin) %>%
+  dplyr::select(country_of_origin, Qualityclassindicator) %>%
+  my_skim() %>%
+  dplyr::select(country_of_origin, n, numeric.mean) %>%
+  transmute(country_of_origin=country_of_origin,
+            number_of_batch=n,
+            Proportion_of_good_quality=numeric.mean) %>%
+  kable(caption = '\\label{tab:countryskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+```
+
+```{r, eval = TRUE}
+analysis %>%
+  group_by(Qualityclass) %>%
+  dplyr::select(Qualityclass, aroma, flavor, acidity, category_two_defects) %>%
+  my_skim() %>%
+  transmute(Variable=skim_variable, Qualityclass=Qualityclass, n=n, Mean=numeric.mean, SD=numeric.sd,
+            Min=numeric.p0, Median=numeric.p50,  Max=numeric.p100,
+            IQR = numeric.p75-numeric.p50) %>%
+  kable(caption = '\\label{tab:catskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
 ```{r aroma, echo = FALSE}
