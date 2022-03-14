@@ -5,11 +5,9 @@ date: "3/7/2022"
 output: pdf_document
 ---
 
-#Loading of libraries and data import
-
 ```{r libraries, echo = FALSE}
 
-#Load necessary libraries for the data exploration and analysis.
+#Load necessary libraries for the data exploration and analysis
 
 library(tidyverse)
 library(moderndive)
@@ -26,7 +24,6 @@ library(MASS)
 library(janitor)
 library(ggplot2)
 library(caret)
-library(lme4)
 ```
 
 ```{r import, echo = FALSE}
@@ -34,6 +31,7 @@ library(lme4)
 #Read in data from github and abbreviate certain country names.
 
 analysis <- read_csv("https://raw.githubusercontent.com/brent-strong/DAS2022-Group-09/main/dataset9.csv")
+
 glimpse(analysis)
 
 for(i in 1:nrow(analysis)){
@@ -50,28 +48,63 @@ for(i in 1:nrow(analysis)){
     analysis$country_of_origin[i] <- analysis$country_of_origin[i]
   }
 }
+
 # View(analysis)
+
 ```
 
-#Exploratory analysis
-
-```{r import, echo = FALSE}
+```{r , echo = FALSE}
 
 # glimpse(analysis)
 
 #Use the skim function but separate out altitude_mean_meters and harvested in order to make the tables easier to read.
 
-analysis %>%
-  select(-altitude_mean_meters, -harvested) %>%
-  skim_without_charts()
 
-analysis %>%
-  select(altitude_mean_meters, harvested) %>%
-  skim_without_charts()
 
 #Examine the proportion of batches that are good:
 
 mean(analysis$Qualityclass=="Good")
+```
+
+```{r, echo=FALSE, eval = TRUE}
+my_skim2 <- skim_with(numeric = sfl(hist = NULL))
+analysis %>%
+  dplyr::select(-country_of_origin, -Qualityclass) %>%
+  my_skim2() %>%
+  dplyr::select(-c(n_missing, complete_rate, skim_type)) %>%
+  kable(col.names = c("Variable", "Mean", "SD", "Min.", "1st Q.", "Median",
+                        "3rd Q.", "Max."), 
+        caption = 'Summary statistics of altitude mean meters and harvested.',
+        booktabs = TRUE, format = "latex", digits = 2) %>%
+  kable_styling(font_size = 9, latex_options = "HOLD_position")
+```
+
+```{r, eval = TRUE}
+my_skim <- skim_with(base = sfl(n = length))
+my.analysis <- analysis %>%
+  mutate(Qualityclassindicator = as.numeric(Qualityclass=="Good"))
+my.analysis %>%
+  group_by(country_of_origin) %>%
+  dplyr::select(country_of_origin, Qualityclassindicator) %>%
+  my_skim() %>%
+  dplyr::select(country_of_origin, n, numeric.mean) %>%
+  transmute(country_of_origin=country_of_origin,
+            number_of_batch=n,
+            Proportion_of_good_quality=numeric.mean) %>%
+  kable(caption = '\\label{tab:countryskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+```
+
+```{r, eval = TRUE}
+analysis %>%
+  group_by(Qualityclass) %>%
+  dplyr::select(Qualityclass, aroma, flavor, acidity, category_two_defects) %>%
+  my_skim() %>%
+  transmute(Variable=skim_variable, Qualityclass=Qualityclass, n=n, Mean=numeric.mean, SD=numeric.sd,
+            Min=numeric.p0, Median=numeric.p50,  Max=numeric.p100,
+            IQR = numeric.p75-numeric.p50) %>%
+  kable(caption = '\\label{tab:catskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
 ```{r aroma, echo = FALSE}
@@ -199,12 +232,12 @@ ggplot(data = analysis2, mapping = aes(y = altitude_mean_meters)) +
 
 # glimpse(analysis)
 
-# Generate histogram to visualize year of harvest (harvested) data.
+# Generate histogram to visualize year of harvest(harvested) data.
 
 ggplot(data = analysis, mapping = aes(x = harvested)) +
   geom_histogram()
 
-# Generate boxplot to visualize year of harvest (harvested) data.
+# Generate boxplot to visualize year of harvest(harvested) data.
 
 ggplot(data = analysis, mapping = aes(y = harvested)) +
   geom_boxplot()
@@ -242,154 +275,156 @@ p4<-ggplot(data = analysis3[27:34,], mapping = aes(x = country_of_origin, y = pr
 grid.arrange(p1, p2, p3, p4, nrow = 4)
 ```
 
-#Creation of the final data set
-
-```{r data, echo = FALSE}
+```{r boxplots, echo = FALSE}
 
 # glimpse(analysis)
 
 # Create the final data set. Remove observations that have implausible values for at least one of the variables. Standardize aroma, flavor, acidity, and altitude. Apply a log(x+1) transformation to category_two_defects variable. Turn Qualityclass into an indicator variable so that it can be used in the logistic regression analysis. Remove unneeded variables.
 
 coffee_final <- analysis %>%
-  filter(acidity != 0 & (altitude_mean_meters < 8849 | is.na(altitude_mean_meters))) %>%
-  mutate(aroma = scale(aroma), flavor=scale(flavor), acidity=scale(acidity), defects_log = log(category_two_defects + 1), year = as.factor(harvested), Qualityclass = 0 + as.numeric(Qualityclass == "Good")) 
+  filter(acidity != 0 & altitude_mean_meters < 8849 & !is.na(harvested)) %>%
+  mutate(aroma = as.numeric(scale(aroma)), flavor=as.numeric(scale(flavor)), acidity=as.numeric(scale(acidity)), defects_log = log(category_two_defects + 1), altitude = as.numeric(scale(altitude_mean_meters)), year = as.factor(harvested), Qualityclass = 0 + as.numeric(Qualityclass == "Good")) 
 
-#Divide into 3 levels for altitude based on information obtained in literature review.
-
-coffee_final$altitude_level_1 <- ifelse(coffee_final$altitude_mean_meters<900,1,0)
-coffee_final$altitude_level_2 <- ifelse(coffee_final$altitude_mean_meters>=900 & coffee_final$altitude_mean_meters<=1200,1,0)
-coffee_final$altitude_level_3 <- ifelse(coffee_final$altitude_mean_meters>1200,1,0)
+##divide 3 levels for the altitude @hameed_coffee_2020
+coffee_final$level_1 <- ifelse(coffee_final$altitude_mean_meters<900,1,0)
+coffee_final$level_2 <- ifelse(coffee_final$altitude_mean_meters>=900 & coffee_final$altitude_mean_meters<=1200,1,0)
+coffee_final$level_3 <- ifelse(coffee_final$altitude_mean_meters>1200,1,0)
 coffee_final <- coffee_final %>%
-  mutate(altitude_level = as.character(altitude_level_1 + altitude_level_2*2 + altitude_level_3*3))
-  
+  mutate(level = as.character(level_1 + level_2*2 + level_3*3))
+
 # Finally we can get the final dataset coffee_final
 
 coffee_final <- coffee_final %>%
-  dplyr::select(country_of_origin, aroma, flavor, acidity, defects_log, year, altitude_level, Qualityclass)
-  
-# View the final data set and make sure that the standardizations and transformation were appropriately applied.
+  dplyr::select(country_of_origin, aroma, flavor, acidity, defects_log, year, level, Qualityclass)
 
-skim_without_charts(coffee_final)
+# View the final data set and make that the standardizations and transformation were appropriately applied.
+
 glimpse(coffee_final)
+# View(coffee_final)
+#skim_without_charts(coffee_final)
+
+#Examine the number of observations by year.
+
+coffee_final %>%
+  group_by(year) %>%
+  summarize(n=n())
 
 ```
+
+```{r}
+
+# We generate a table to have a look at the proportion and counts for both Good and Poor quality based on the country of origin and harvested years respectively.
+
+coffee_final %>% 
+  tabyl(Qualityclass, country_of_origin) %>% 
+  adorn_percentages() %>% 
+  adorn_pct_formatting() %>% 
+  adorn_ns()
+
+coffee_final %>% 
+  tabyl(Qualityclass, year) %>% 
+  adorn_percentages() %>% 
+  adorn_pct_formatting() %>% 
+  adorn_ns()
+
+```
+
+```{r}
+
+# Plot a bar chart to get intuition of whether the quality of coffee is influenced by the year of harvesting.
+
+ggplot(coffee_final, aes(x= year,  y = ..prop.., group=Qualityclass, fill=Qualityclass)) + 
+    geom_bar(position="dodge", stat="count") +
+    labs(y = "Proportion")
+
+```
+
 
 # Formal Analysis
 
+## Build the models
+
+
+**Only base on the altitude**
 ```{r}
-
-#Fit a logistic regression model with no intercept to examine the association of each altitude level with the probability of a particular batch having a good quality rating. 
-
-model_altitude_level <- glm(Qualityclass ~ altitude_level - 1, data = coffee_final,family = binomial(link = "logit"))
-summary(model_altitude_level)
+model_level <- glm(Qualityclass ~ level - 1, data = coffee_final,family = binomial(link = "logit"))
+summary(model_level)
 ```
 
-
+**Base on the year of harvest**
 ```{r}
-
-#Fit a logistic regression model  to examine the association of each year with the probability of a particular batch having a good quality rating. 
-
 model_year <- glm(Qualityclass ~ year, data = coffee_final,family = binomial(link = "logit"))
 summary(model_year)
 ```
 
-
+**Base on the country**
 ```{r}
-
-#Fit a logistic regression model with each country as an indicator variable.
-
 model_country <- glm(Qualityclass ~ country_of_origin, data = coffee_final,family = binomial(link = "logit"))
 summary(model_country)
 ```
 
-
+According the result before, we choose some significant country as a class variable.
 ```{r}
-
-#Create indicator variables for countries that appear to have a  highly significant influence on coffee quality. 
-
 coffee_final$Colombia <- ifelse(coffee_final$country_of_origin == 'Colombia',1,0)
 coffee_final$Mexico <- ifelse(coffee_final$country_of_origin == 'Mexico',1,0)
 coffee_final$Honduras <- ifelse(coffee_final$country_of_origin == 'Honduras',1,0)
 coffee_final$Kenya <- ifelse(coffee_final$country_of_origin == 'Kenya',1,0)
-#glimpse(coffee_final)
 ```
 
 ```{r}
-
-#Fit model with just these indicator variables. 
-
 model_co_4 <- glm(Qualityclass ~ Colombia + Mexico + Honduras + Kenya-1, data = coffee_final,family = binomial(link = "logit"))
 summary(model_co_4)
 ```
 
-
+**Base on the year and country**
 ```{r}
+model_cn_ye <- glm(Qualityclass ~ country_of_origin + year, data = coffee_final,family = binomial(link = "logit"))
+summary(model_cn_ye)
+```
 
-#Fit logistic regression model including every possible predictor. Fitted probabilites of 0 or 1 occurred indicating the need for a simpler model.
+**Base on the altitude and country**
+```{r,warning=FALSE}
+model_al_co <- glm(Qualityclass ~ level + Colombia + Mexico + Honduras + Kenya, data = coffee_final,family = binomial(link = "logit"))
+summary(model_al_co)
+```
 
-model_all <- glm(Qualityclass ~ aroma + flavor + acidity + country_of_origin + defects_log + altitude_level + year, data = coffee_final,family = binomial(link = "logit"))
+
+**Base on the 3**
+```{r,warning=FALSE}
+model_al_co <- glm(Qualityclass ~ level + country_of_origin + year - 1, data = coffee_final,family = binomial(link = "logit"))
+summary(model_al_co)
+```
+
+
+Colombia + Mexico + Honduras + Kenya
+
+
+**Consider everything**
+```{r}
+model_all <- glm(Qualityclass ~ aroma + flavor + acidity + country_of_origin + defects_log + level + year, data = coffee_final,family = binomial(link = "logit"))
 summary(model_all)
 ```
 
 ```{r}
-
-#Fit logistic regression model with only indicator variables for influential countries retained. Use a data set with observations that having any missing values removed (i.e., complete observations).
-
-coffee_final_nomiss <- coffee_final %>%
-  filter(!is.na(altitude_level)&!is.na(year))
-glimpse(coffee_final_nomiss)
-
-model_all_2 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + Honduras + Kenya + defects_log + altitude_level + year, data = coffee_final_nomiss, family = binomial(link = "logit"))
+model_all_2 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + Honduras + Kenya + defects_log + level + year, data = coffee_final, family = binomial(link = "logit"))
 summary(model_all_2)
 ```
 
 ```{r}
-
-#Perform stepwise selection by minimizing the AIC value to get the best model. Use only complete observations.
-
 stepAIC(model_all_2, direction = 'both')
 ```
 
 ```{r}
-
-#Fit logistic regression model with only indicator variables for influential countries retained. Use a data set with missing observations filled in with year and altitude imputed to the most common category.
-
-table(coffee_final$year)
-table(coffee_final$altitude_level)
-
-coffee_final_imputed <- coffee_final %>%
-  mutate(altitude_level=as.factor(ifelse(is.na(altitude_level),3,altitude_level)), year=as.factor(ifelse(is.na(year),3,year)))
-
-table(coffee_final_imputed$year)
-table(coffee_final_imputed$altitude_level)
-
-model_all_3 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + Honduras + Kenya + defects_log + altitude_level + year, data = coffee_final_imputed, family = binomial(link = "logit"))
-summary(model_all_3)
-
-```
-
-```{r}
-
-#Perform stepwise selection by minimizing the AIC value to get the best model. Use imputed data set.
-
-stepAIC(model_all_3, direction = 'both')
-```
-
-```{r}
-
-#Fit the best logistic regression model (same one was found using both approaches) to all available data. Missingness is not an issue because altitude and year are dropped. 
-
 model_best <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log, data = coffee_final,family = binomial(link = "logit"))
 summary(model_best)
 ```
 
 ```{r}
-
-#Use 10-fold cross-validation to assess the predictive performance of the model. 
-
-set.seed(50)
+set.seed(9)
 folds <- createFolds(y=coffee_final$Qualityclass, k=10)
 accuracy <- as.numeric()
+sensitivity <- as.numeric()
+specificity <- as.numeric()
 for(i in 1:10){
   fold_test <- coffee_final[folds[[i]],]
   fold_train <- coffee_final[-folds[[i]],]
@@ -397,34 +432,12 @@ for(i in 1:10){
   fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
   fold_predict <- ifelse(fold_predict >= 0.5, 1, 0)
   accuracy[i] <- mean(fold_predict == fold_test[,8])
+  sensitivity[i] <- sum(fold_predict + fold_test[,8] == 2) / sum(fold_test[,8] == 1)
+  specificity[i] <- sum(fold_predict + fold_test[,8] == 0) / sum(fold_test[,8] == 0)
 }
 mean(accuracy)
+
+mean(sensitivity)
+
+mean(specificity)
 ```
-
-```{r}
-
-#Fit a generalized linear mixed model with a random intercept for country as a sensitivity analysis. 
-
-model_glmm <- glmer(Qualityclass ~ 1 + aroma + flavor + acidity + defects_log + (1|country_of_origin), data = coffee_final,family = binomial(link = "logit"))
-summary(model_glmm, corr=FALSE)
-```
-
-```{r}
-
-#Use 10-fold cross-validation to assess the predictive performance of the model when country indicators are not included. 
-
-set.seed(50)
-folds <- createFolds(y=coffee_final$Qualityclass, k=10)
-accuracy <- as.numeric()
-for(i in 1:10){
-  fold_test <- coffee_final[folds[[i]],]
-  fold_train <- coffee_final[-folds[[i]],]
-  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + defects_log,family = binomial(link = logit), data =fold_train)
-  fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
-  fold_predict <- ifelse(fold_predict >= 0.5, 1, 0)
-  accuracy[i] <- mean(fold_predict == fold_test[,8])
-}
-mean(accuracy)
-```
-
-
