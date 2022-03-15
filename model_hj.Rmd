@@ -1,0 +1,276 @@
+---
+title: "G9_p2"
+author: "Hongjin Ren"
+date: "2022/3/10"
+output:
+  html_document:
+    df_print: paged
+bibliography: "D:/glasgow/git/Git hub/GitHub/DAS2022-Group-09/DAS.bib"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries,warning=FALSE}
+library(tidyverse)
+library(moderndive)
+library(skimr)
+library(kableExtra)
+library(gridExtra)
+library(broom)
+library(olsrr)
+library(gapminder)
+library(sjPlot)
+library(stats)
+library(jtools)
+library(MASS)
+library(janitor)
+library(ggplot2)
+library(GGally)
+```
+
+```{r,warning=FALSE}
+coffee <- read_csv("https://raw.githubusercontent.com/brent-strong/DAS2022-Group-09/main/dataset9.csv")
+```
+
+- country_of_origin – Country where the coffee bean originates from.
+- aroma – Aroma grade (ranging from 0-10)
+- flavor – Flavor grade (ranging from 0-10)
+- acidity – Acidity grade (ranging from 0-10)
+- category_two_defects – Count of category 2 type defects in the batch of coffee beans tested.
+- altitiude_mean_meters – Mean altitude of the growers farm (in metres)
+- harvested – Year the batch was harvested
+- Qualityclass – Quality score for the batch (Good - ≥ 82.5, Poor - <82.5). Note: 82.5
+was selected as the cut off as this is the median score for all the batches tested.
+
+```{r}
+coffee %>%
+  group_by(country_of_origin) %>%
+  summarise(n=n(),Mean=round(mean(altitude_mean_meters,na.rm=T),digits=2), St.Dev=round(sd(altitude_mean_meters,na.rm=T),digits=2),
+            Min=min(altitude_mean_meters,na.rm=T), Q1 = quantile(altitude_mean_meters,0.25,na.rm=T), Median=median(altitude_mean_meters,na.rm=T),
+            Q3 = quantile(altitude_mean_meters,0.75,na.rm=T), Max=max(altitude_mean_meters,na.rm=T))
+
+```
+
+
+
+
+```{r}
+co_Na <- na.omit(coffee)
+```
+
+```{r}
+cor(co_Na[2:6])
+```
+
+
+#factor the respond data
+```{r}
+co_Na$class[co_Na$Qualityclass == "Poor"] <- 0
+co_Na$class[co_Na$Qualityclass == "Good"] <- 1
+co_Na$class <- factor(co_Na$class,
+                      levels = c(0,1),
+                      labels = c("Poor","Good"))
+
+```
+
+
+
+##divide 3 levels for the altitude @hameed_coffee_2020
+```{r}
+co_Na$level_1 <- ifelse(co_Na$altitude_mean_meters<900,1,0)
+co_Na$level_2 <- ifelse(co_Na$altitude_mean_meters>=900 & co_Na$altitude_mean_meters<=1200,1,0)
+co_Na$level_3 <- ifelse(co_Na$altitude_mean_meters>1200,1,0)
+co_Na <- co_Na %>%
+  mutate(level = as.character(level_1 + level_2*2 + level_3*3))
+
+```
+
+
+```{r}
+ggpairs(co_Na, columns=2:6,aes(color=class))
+cor(coffee[2:6])
+```
+
+```{r}
+coffee %>% 
+  tabyl(Qualityclass, country_of_origin) %>% 
+  adorn_percentages() %>% 
+  adorn_pct_formatting() %>% 
+  adorn_ns()
+
+```
+
+```{r}
+coffee %>% 
+  tabyl(Qualityclass, harvested) %>% 
+  adorn_percentages() %>% 
+  adorn_pct_formatting() %>% 
+  adorn_ns()
+
+```
+
+
+
+```{r}
+ggplot(co_Na, aes(x= level,  y = ..prop.., group=class, fill=class)) + 
+    geom_bar(position="dodge", stat="count") +
+    labs(y = "Proportion")
+
+```
+
+
+
+I think we need to transform the num:year to chr:year
+```{r}
+co_Na$harvested <- as.character(co_Na$harvested)
+```
+
+
+
+#-------------------------------build model
+
+**Only base on the altitude**
+```{r}
+model_level <- glm(class ~ level - 1, data = co_Na,family = binomial(link = "logit"))
+summary(model_level)
+
+```
+
+**Base on the harvested**
+```{r}
+model_year <- glm(class ~ harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_year)
+```
+
+**Base on the country**
+```{r}
+model_country <- glm(class ~ country_of_origin, data = co_Na,family = binomial(link = "logit"))
+summary(model_country)
+```
+
+According the result before, we choose some significant country as a class variable.
+```{r}
+co_Na$Colombia <- ifelse(co_Na$country_of_origin == 'Colombia',1,0)
+co_Na$Mexico <- ifelse(co_Na$country_of_origin == 'Mexico',1,0)
+co_Na$Honduras <- ifelse(co_Na$country_of_origin == 'Honduras',1,0)
+co_Na$Kenya <- ifelse(co_Na$country_of_origin == 'Kenya',1,0)
+
+```
+
+```{r}
+model_co_4 <- glm(class ~ Colombia + Mexico + Honduras + Kenya-1, data = co_Na,family = binomial(link = "logit"))
+summary(model_co_4)
+```
+
+**Base on the year and country**
+```{r}
+model_cn_ye <- glm(class ~ country_of_origin + harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_cn_ye)
+```
+
+**Base on the altitude and country**
+```{r,warning=FALSE}
+model_al_co <- glm(class ~ level + Colombia + Mexico + Honduras + Kenya, data = co_Na,family = binomial(link = "logit"))
+summary(model_al_co)
+
+```
+
+
+**Base on the 3**
+```{r,warning=FALSE}
+model_al_co <- glm(class ~ level + country_of_origin + harvested-1, data = co_Na,family = binomial(link = "logit"))
+summary(model_al_co)
+```
+
+
+
+Colombia + Mexico + Honduras + Kenya
+
+
+**Consider everything**
+```{r}
+model_all <- glm(class ~ aroma + flavor + acidity + country_of_origin + category_two_defects + altitude_mean_meters + harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_all)
+```
+
+
+```{r}
+model_all_2 <- glm(class ~ aroma + flavor + acidity + Colombia + Mexico + Honduras + Kenya + category_two_defects + altitude_mean_meters + harvested, data = co_Na,family = binomial(link = "logit"))
+summary(model_all_2)
+```
+
+
+```{r}
+model_test <- glm(class ~ aroma + flavor + acidity, data = co_Na,family = binomial(link = "logit"))
+summary(model_test)
+testdata <- co_Na[c(1:6),]
+testdata$prob <- predict(model_test,newdata = testdata,type = "response")
+testdata
+```
+
+
+
+
+
+
+```{r}
+stepAIC(model_all_2, direction = 'both')
+```
+
+```{r}
+model_best <- glm(class ~ aroma + flavor + acidity + Colombia + Mexico + category_two_defects, data = co_Na,family = binomial(link = "logit"))
+summary(model_best)
+
+```
+
+#--------------------------------test model
+
+```{r}
+
+pre <- predict(model_best,type='response')
+
+data <- data.frame(prob=pre,obs=co_Na$class)
+
+data <- data[order(data$prob),]
+n <- nrow(data)
+tpr <- fpr <- rep(0,n)
+
+for (i in 1:n) {
+    threshold <- data$prob[i]
+    tp <- sum(data$prob > threshold & data$obs == "Good")
+    fp <- sum(data$prob > threshold & data$obs == "Poor")
+    tn <- sum(data$prob < threshold & data$obs == "Poor")
+    fn <- sum(data$prob < threshold & data$obs == "Good")
+    tpr[i] <- tp/(tp+fn) 
+    fpr[i] <- fp/(tn+fp) 
+}
+
+plot(fpr,tpr,type='l')
+abline(a=0,b=1)
+
+```
+
+
+Precision
+```{r}
+TP <- sum(data$prob > 0.5 & data$obs == "Good")
+FP <- sum(data$prob >= 0.5 & data$obs == "Poor")
+TN <- sum(data$prob <= 0.5 & data$obs == "Poor")
+FN <- sum(data$prob < 0.5 & data$obs == "Good")
+Precision <- TP/(TP+FP)
+Accuracy <- (TP + TN)/(TP + TN + FP + FN)
+Precision
+Accuracy
+```
+
+
+
+#------------------
+
+
+
+
+
+

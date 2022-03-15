@@ -4,6 +4,7 @@ author: "Brent Strong, Enyu Li, Haotian Wang, Honjin Ren, Mu He"
 date: "3/7/2022"
 output: pdf_document
 ---
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, comment = NA, message = FALSE, warning = FALSE)
 ```
@@ -54,12 +55,10 @@ for(i in 1:nrow(analysis)){
 
 # View(analysis)
 
-```
-
-```{r , echo = FALSE}
-# glimpse(analysis)
 #Examine the proportion of batches that are good:
+
 mean(analysis$Qualityclass=="Good")
+
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -70,7 +69,7 @@ analysis %>%
   dplyr::select(-c(n_missing, complete_rate, skim_type)) %>%
   kable(col.names = c("Variable", "Mean", "SD", "Min.", "1st Q.", "Median",
                         "3rd Q.", "Max."), 
-        caption = 'Summary statistics of continuous variables.',
+        caption = 'Summary statistics of altitude mean meters and harvested.',
         booktabs = TRUE, format = "latex", digits = 2) %>%
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
@@ -87,7 +86,19 @@ my.analysis %>%
   transmute(country_of_origin=country_of_origin,
             number_of_batch=n,
             Proportion_of_good_quality=numeric.mean) %>%
-  kable(caption = 'Number of batch and proportion of good quality by country of origin', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable(caption = '\\label{tab:countryskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+```
+
+```{r, eval = TRUE}
+analysis %>%
+  group_by(Qualityclass) %>%
+  dplyr::select(Qualityclass, aroma, flavor, acidity, category_two_defects) %>%
+  my_skim() %>%
+  transmute(Variable=skim_variable, Qualityclass=Qualityclass, n=n, Mean=numeric.mean, SD=numeric.sd,
+            Min=numeric.p0, Median=numeric.p50,  Max=numeric.p100,
+            IQR = numeric.p75-numeric.p50) %>%
+  kable(caption = '\\label{tab:catskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
@@ -115,13 +126,16 @@ grid.arrange(p1, p2, ncol = 2)
 ```
 
 ```{r flavor, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for flavor.", fig.pos = 'H', message = FALSE}
+
 #Generate histogram to visualize flavor data.
 p1 <- ggplot(data = analysis, mapping = aes(x = flavor)) +
   geom_histogram()
 #Generate boxplot to visualize flavor data.
 p2 <- ggplot(data = analysis, mapping = aes(y = flavor)) +
   geom_boxplot()
+  
 grid.arrange(p1, p2, ncol = 2)
+
 # Single observation with a value of 0 is odd.
 ```
 
@@ -132,14 +146,16 @@ p1 <- ggplot(data = analysis, mapping = aes(x = acidity)) +
   geom_histogram()
 #Generate boxplot to visualize acidity data.
 p2 <- ggplot(data = analysis, mapping = aes(y = acidity)) +
-  geom_boxplot()
+geom_boxplot()
+  
 grid.arrange(p1, p2, ncol = 2)
 
 # Single observation with a value of 0 is odd. See if this same observation has a value of 0 for flavor and aroma as well.
+
 analysis %>% 
   filter(acidity == 0 & flavor == 0 & aroma == 0)
+  
 #Will delete the observation in the formal analysis. 
-
 ```
 
 ```{r category_two_defects, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for category two defects.", fig.pos = 'H', message = FALSE}
@@ -149,10 +165,12 @@ p1 <- ggplot(data = analysis, mapping = aes(x = category_two_defects)) +
 #Generate boxplot to visualize category_two_defects data.
 p2 <- ggplot(data = analysis, mapping = aes(y = category_two_defects)) +
   geom_boxplot()
+  
 grid.arrange(p1, p2, ncol = 2)
 ```
 
 Due to the right-skewed distribution of category_two_defects, log-transformation is applied.
+
 
 ```{r category_two_defects2, echo = FALSE}
 
@@ -160,6 +178,7 @@ Due to the right-skewed distribution of category_two_defects, log-transformation
 
 analysis1 <- analysis %>%
   mutate(defects_log = log(category_two_defects+1))
+  
 ```
 
 ``` {r category_two_defects3, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for category two defects after log transformation.", fig.pos = 'H', message = FALSE}
@@ -172,18 +191,17 @@ p2 <- ggplot(data = analysis1, mapping = aes(y = defects_log)) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
-``` {r , echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for altitude.", fig.pos = 'H', message = FALSE}
-# Generate histogram to visualize category_two_defects data after log-transformation.
+``` {r altitude, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for altitude.", fig.pos = 'H', message = FALSE}
+# Generate histogram to visualize altitude data.
 p1 <- ggplot(data = analysis, mapping = aes(x = altitude_mean_meters)) +
   geom_histogram()
-# Generate boxplot to visualize category_two_defects data after log-transformation.
+# Generate boxplot to visualize altitude data.
 p2 <- ggplot(data = analysis, mapping = aes(y = altitude_mean_meters)) +
-  geom_boxplot()
+geom_boxplot()
 grid.arrange(p1, p2, ncol = 2)
 ```
-Mt. Everest is only 8,849 meters tall. Remove any observations with altitudes higher than that.
 
-```{r altitude1, echo = FALSE}
+```{r altitude2, echo = FALSE}
 
 # Mt. Everest is only 8,849 meters tall. Remove any observations with altitudes higher than that.
 
@@ -191,21 +209,21 @@ analysis2 <- analysis %>%
   filter(altitude_mean_meters < 8849)
 ```
 
-``` {r altitude2, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for altitude after removing implausuble observations.", fig.pos = 'H', message = FALSE}
-# Generate histogram to visualize category_two_defects data after log-transformation.
+``` {r altitude3, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for altitude after removing implausuble observations.", fig.pos = 'H', message = FALSE}
+# Generate histogram to visualize altitude data after removing implausible observations.
 p1 <- ggplot(data = analysis2, mapping = aes(x = altitude_mean_meters)) +
   geom_histogram()
-# Generate boxplot to visualize category_two_defects data after log-transformation.
+# Generate boxplot to visualize altitude data after removing implausible observations.
 p2 <- ggplot(data = analysis2, mapping = aes(y = altitude_mean_meters)) +
   geom_boxplot()
 grid.arrange(p1, p2, ncol = 2)
 ```
 
 ``` {r harvested, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for harvested.", fig.pos = 'H', message = FALSE}
-# Generate histogram to visualize category_two_defects data after log-transformation.
+# Generate histogram to visualize year of harvest data.
 p1 <- ggplot(data = analysis, mapping = aes(x = harvested)) +
   geom_histogram()
-# Generate boxplot to visualize category_two_defects data after log-transformation.
+# Generate boxplot to visualize year of harvest data.
 p2 <- ggplot(data = analysis, mapping = aes(y = harvested)) +
   geom_boxplot()
 grid.arrange(p1, p2, ncol = 2)
@@ -410,9 +428,62 @@ mean(specificity)
 ```
 
 
+**Base on the altitude and country**
+```{r,warning=FALSE}
+model_al_co <- glm(Qualityclass ~ level + Colombia + Mexico + Honduras + Kenya, data = coffee_final,family = binomial(link = "logit"))
+summary(model_al_co)
+```
 
 
+**Base on the 3**
+```{r,warning=FALSE}
+model_al_co <- glm(Qualityclass ~ level + country_of_origin + year - 1, data = coffee_final,family = binomial(link = "logit"))
+summary(model_al_co)
+```
 
 
+Colombia + Mexico + Honduras + Kenya
 
 
+**Consider everything**
+```{r}
+model_all <- glm(Qualityclass ~ aroma + flavor + acidity + country_of_origin + defects_log + level + year, data = coffee_final,family = binomial(link = "logit"))
+summary(model_all)
+```
+
+```{r}
+model_all_2 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + Honduras + Kenya + defects_log + level + year, data = coffee_final, family = binomial(link = "logit"))
+summary(model_all_2)
+```
+
+```{r}
+stepAIC(model_all_2, direction = 'both')
+```
+
+```{r}
+model_best <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log, data = coffee_final,family = binomial(link = "logit"))
+summary(model_best)
+```
+
+```{r}
+set.seed(9)
+folds <- createFolds(y=coffee_final$Qualityclass, k=10)
+accuracy <- as.numeric()
+sensitivity <- as.numeric()
+specificity <- as.numeric()
+for(i in 1:10){
+  fold_test <- coffee_final[folds[[i]],]
+  fold_train <- coffee_final[-folds[[i]],]
+  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log,family = binomial(link = logit), data =fold_train )
+  fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
+  fold_predict <- ifelse(fold_predict >= 0.5, 1, 0)
+  accuracy[i] <- mean(fold_predict == fold_test[,8])
+  sensitivity[i] <- sum(fold_predict + fold_test[,8] == 2) / sum(fold_test[,8] == 1)
+  specificity[i] <- sum(fold_predict + fold_test[,8] == 0) / sum(fold_test[,8] == 0)
+}
+mean(accuracy)
+
+mean(sensitivity)
+
+mean(specificity)
+```
