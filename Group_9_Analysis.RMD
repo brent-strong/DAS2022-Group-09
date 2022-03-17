@@ -5,6 +5,10 @@ date: "3/7/2022"
 output: pdf_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, comment = NA, message = FALSE, warning = FALSE)
+```
+
 #Setup and Data Import
 
 ```{r libraries, echo = FALSE}
@@ -27,6 +31,7 @@ library(janitor)
 library(ggplot2)
 library(caret)
 library(lme4)
+library(ROCR)
 ```
 
 ```{r import, echo = FALSE}
@@ -321,7 +326,7 @@ coffee_final <- coffee_final %>%
 
 glimpse(coffee_final)
 
-skim_without_charts(coffee_final)
+# skim_without_charts(coffee_final)
 
 #Determine the number of observations by year.
 
@@ -554,4 +559,107 @@ mean(sensitivity)
 mean(specificity)
 
 #Predictive accuracy is still very good. 
+```
+
+## Classfication boundry
+```{r}
+coffee_final$prid <- predict(model_best, coffee_final, type='response')
+score <- prediction(coffee_final$prid, coffee_final$Qualityclass)
+perf <- performance(score, 'tpr', 'fpr')
+auc <- performance(score, 'auc')
+perfd <- data.frame(x=perf@x.values[1][[1]], y=perf@y.values[1][[1]])
+ggplot(perfd, aes(x= x, y=y)) + geom_line() +
+  xlab("False positive rate") + ylab("True positive rate") +
+  ggtitle(paste("Area under the curve:", round(auc@y.values[[1]], 3)))
+
+```
+
+
+```{r}
+cutoffs <- data.frame(cut=perf@alpha.values[[1]], 
+                      fpr=perf@x.values[[1]], 
+                      tpr=perf@y.values[[1]],
+                      dif=perf@y.values[[1]] - perf@x.values[[1]])
+head(cutoffs[order(cutoffs$dif, decreasing = T), ])
+bestcut <- cutoffs[order(cutoffs$dif, decreasing = T), ]$cut[1]
+bestcut
+
+```
+
+```{r}
+cutoffs <- data.frame(cut=perf@alpha.values[[1]], 
+                      fpr=perf@x.values[[1]], 
+                      tpr=perf@y.values[[1]],
+                      dif=perf@y.values[[1]] - perf@x.values[[1]])
+head(cutoffs[order(cutoffs$dif, decreasing = T), ])
+
+
+```
+
+```{r}
+
+#Perform 10-fold cross validation to assess the predictive performance of the model which use the best cutoff point by the whole dataset.
+# Calculate overall accuracy, sensitivity, and specificity. 
+
+set.seed(9)
+folds <- createFolds(y=coffee_final$Qualityclass, k=10)
+accuracy <- as.numeric()
+sensitivity <- as.numeric()
+specificity <- as.numeric()
+for(i in 1:10){
+  fold_test <- coffee_final[folds[[i]],]
+  fold_train <- coffee_final[-folds[[i]],]
+  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log,family = binomial(link = logit), data =fold_train )
+  fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
+  fold_predict <- ifelse(fold_predict >= bestcut, 1, 0)
+  accuracy[i] <- mean(fold_predict == fold_test[,8])
+  sensitivity[i] <- sum(fold_predict + fold_test[,8] == 2) / sum(fold_test[,8] == 1)
+  specificity[i] <- sum(fold_predict + fold_test[,8] == 0) / sum(fold_test[,8] == 0)
+}
+mean(accuracy)
+
+mean(sensitivity)
+
+mean(specificity)
+```
+
+```{r}
+# Here is a function which can find the best cutoff point automatically
+findbestcut <- function(model, data){
+  data$prid <- predict(model, data, type='response')
+  score <- prediction(data$prid, data$Qualityclass)
+  perf <- performance(score, 'tpr', 'fpr')
+  cutoffs <- data.frame(cut=perf@alpha.values[[1]], dif=perf@y.values[[1]] - perf@x.values[[1]])
+  bestcut <- cutoffs[order(cutoffs$dif, decreasing = T), ]$cut[1]
+  return(bestcut)
+}
+
+```
+
+```{r}
+
+#Perform 10-fold cross validation to assess the predictive performance of the model which can use best cutoff point automatically.
+#Calculate overall accuracy, sensitivity, and specificity. 
+
+set.seed(9)
+folds <- createFolds(y=coffee_final$Qualityclass, k=10)
+accuracy <- as.numeric()
+sensitivity <- as.numeric()
+specificity <- as.numeric()
+for(i in 1:10){
+  fold_test <- coffee_final[folds[[i]],]
+  fold_train <- coffee_final[-folds[[i]],]
+  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log,family = binomial(link = logit), data =fold_train )
+  fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
+  fold_predict <- ifelse(fold_predict >= findbestcut(fold_pre, fold_train), 1, 0)
+  accuracy[i] <- mean(fold_predict == fold_test[,8])
+  sensitivity[i] <- sum(fold_predict + fold_test[,8] == 2) / sum(fold_test[,8] == 1)
+  specificity[i] <- sum(fold_predict + fold_test[,8] == 0) / sum(fold_test[,8] == 0)
+}
+mean(accuracy)
+
+mean(sensitivity)
+
+mean(specificity)
+# The accuracy and sensitivity be improved a little bit.
 ```
