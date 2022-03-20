@@ -571,6 +571,9 @@ glimpse(coffee_final_nomiss)
 
 model_all_2 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + Honduras + Kenya + defects_log + level + year, data = coffee_final_nomiss, family = binomial(link = "logit"))
 summary(model_all_2)
+
+model_all_4 <- glm(Qualityclass ~ aroma + flavor + acidity + country_of_origin + defects_log + level + year, data = coffee_final_nomiss,family = binomial(link = "logit"))
+# has warning
 ```
 
 ```{r}
@@ -578,6 +581,15 @@ summary(model_all_2)
 #Find the model that best fits the data using AIC. Incomplete observations are dropped.
 
 stepAIC(model_all_2, direction = 'both')
+```
+
+```{r}
+
+#Find the model that best fits the data using AIC. Incomplete observations are dropped.
+
+stepAIC(model_all_4, direction = 'both')
+
+# has warnings
 ```
 
 ```{r}
@@ -616,6 +628,40 @@ stepAIC(model_all_3, direction = 'both')
 
 model_best <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log, data = coffee_final,family = binomial(link = "logit"))
 summary(model_best)
+```
+```{r}
+coffee_all_variables <- analysis %>%
+  filter(acidity != 0 & (altitude_mean_meters < 8849 & !is.na(altitude_mean_meters)) & !is.na(harvested)) %>%
+  mutate(defects_log = log(category_two_defects + 1), year = as.factor(harvested), Qualityclass = 0 + as.numeric(Qualityclass == "Good")) 
+
+countrylist <- unique(coffee_all_variables$country_of_origin)
+countrylist
+
+for(i in 1:length(countrylist)){
+  coffee_all_variables[,10+i] <- as.numeric(coffee_all_variables$country_of_origin == countrylist[i])
+  colnames(coffee_all_variables)[10+i] <- countrylist[i]
+}
+
+# coffee_all_variables <- coffee_all_variables %>%
+  # dplyr::select(-country_of_origin)
+
+head(coffee_all_variables)
+
+model_all_variable <- glm(Qualityclass ~ country_of_origin - 1 , data = coffee_all_variables, family = binomial(link = "logit"))
+summary(model_all_variable)
+
+model_all_variable2 <- glm(Qualityclass ~ aroma + flavor + acidity + altitude_mean_meters + harvested + defects_log + Colombia + Honduras + Kenya + Malawi + Mexico + Uganda , data = coffee_all_variables, family = binomial(link = "logit"))
+summary(model_all_variable2)
+
+
+```
+
+```{r}
+
+#Find the model that best fits the data using AIC. Incomplete observations are imputed to the median value.
+
+modelselection <- stepAIC(model_all_variable2, direction = 'both')
+summary(modelselection)
 ```
 
 ```{r}
@@ -772,6 +818,35 @@ for(i in 1:10){
   fold_test <- coffee_final[folds[[i]],]
   fold_train <- coffee_final[-folds[[i]],]
   fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log,family = binomial(link = logit), data =fold_train )
+  fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
+  fold_predict <- ifelse(fold_predict >= findbestcut(fold_pre, fold_train), 1, 0)
+  accuracy[i] <- mean(fold_predict == fold_test[,8])
+  sensitivity[i] <- sum(fold_predict + fold_test[,8] == 2) / sum(fold_test[,8] == 1)
+  specificity[i] <- sum(fold_predict + fold_test[,8] == 0) / sum(fold_test[,8] == 0)
+}
+mean(accuracy)
+
+mean(sensitivity)
+
+mean(specificity)
+# The accuracy and sensitivity be improved a little bit.
+```
+
+
+```{r}
+
+#Perform 10-fold cross validation to assess the predictive performance of the model which can use best cutoff point automatically.
+#Calculate overall accuracy, sensitivity, and specificity. 
+
+set.seed(9)
+folds <- createFolds(y=coffee_all_variables$Qualityclass, k=10)
+accuracy <- as.numeric()
+sensitivity <- as.numeric()
+specificity <- as.numeric()
+for(i in 1:10){
+  fold_test <- coffee_all_variables[folds[[i]],]
+  fold_train <- coffee_all_variables[-folds[[i]],]
+  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log + Uganda,family = binomial(link = logit), data =fold_train )
   fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
   fold_predict <- ifelse(fold_predict >= findbestcut(fold_pre, fold_train), 1, 0)
   accuracy[i] <- mean(fold_predict == fold_test[,8])
