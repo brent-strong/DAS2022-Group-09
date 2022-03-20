@@ -107,13 +107,35 @@ my.analysis %>%
 
 analysis %>%
   group_by(Qualityclass) %>%
-  dplyr::select(Qualityclass, aroma, flavor, acidity, category_two_defects) %>%
+  dplyr::select(Qualityclass, aroma, flavor, acidity, category_two_defects, harvested) %>%
   my_skim() %>%
   transmute(Variable=skim_variable, Qualityclass=Qualityclass, n=n, Mean=numeric.mean, SD=numeric.sd,
             Min=numeric.p0, Median=numeric.p50,  Max=numeric.p100,
             IQR = numeric.p75-numeric.p50) %>%
   kable(caption = '\\label{tab:catskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
+```
+
+```{r , echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Boxplots of countinous features on different quality class.", fig.pos = 'H', message = FALSE}
+analysis.box <- analysis %>%
+  filter(aroma != 0)
+
+
+p1 <- ggplot(data = analysis.box, mapping = aes(x = factor(Qualityclass), y = aroma)) +
+  geom_boxplot() +
+  labs(x = 'Quality Class')
+p2 <- ggplot(data = analysis.box, mapping = aes(x = factor(Qualityclass), y = flavor)) +
+  geom_boxplot() +
+  labs(x = 'Quality Class')
+p3 <- ggplot(data = analysis.box, mapping = aes(x = factor(Qualityclass), y = acidity)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+p4 <- ggplot(data = analysis.box, mapping = aes(x = factor(Qualityclass), y = harvested)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+
+grid.arrange(p1, p2, p3, p4, ncol = 4)
+
 ```
 
 ```{r aroma, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for aroma.", fig.pos = 'H', message = FALSE}
