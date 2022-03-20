@@ -662,6 +662,12 @@ summary(model_all_variable2)
 
 modelselection <- stepAIC(model_all_variable2, direction = 'both')
 summary(modelselection)
+
+model_all_variable3 <- glm(Qualityclass ~ aroma + flavor + acidity + defects_log + Colombia + Mexico
+                           , data = coffee_all_variables, family = binomial(link = "logit"))
+
+anova(modelselection, model_all_variable3)
+
 ```
 
 ```{r}
@@ -859,4 +865,14 @@ mean(sensitivity)
 
 mean(specificity)
 # The accuracy and sensitivity be improved a little bit.
+```
+
+
+```{r}
+
+#Fit a linear mixed model with a random intercept for country. Included all other predictors from the final, best model.
+
+glmm1 <- glmer(Qualityclass ~ 1 + aroma + flavor + acidity + defects_log + (1|country_of_origin),
+               data=coffee_all_variables, family=binomial(link="logit"))
+summary(glmm1, corr=FALSE)
 ```
