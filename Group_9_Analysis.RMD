@@ -101,13 +101,41 @@ my.analysis %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
+```{r , echo=FALSE, fig.width = 6, fig.align = "center", fig.cap = "Boxplots of good quality rate for each country.", fig.pos = 'H', message = FALSE}
+
+#Create table to show the number of batches and the proportion of good quality for each country.
+analysis.country <- analysis %>%
+  mutate(Qualityclassindicator = as.numeric(Qualityclass=="Good")) %>%
+  group_by(country_of_origin) %>%
+  summarise(good_quality_porprotion = round(mean(Qualityclassindicator), 2),
+            number_of_batch = n())
+
+ggplot(data = analysis.country, mapping = aes(y = good_quality_porprotion)) +
+  geom_boxplot()
+
+
+
+```
+
+```{r, eval = TRUE}
+
+analysis.country %>%
+  filter(good_quality_porprotion <= quantile(good_quality_porprotion, probs = c(0.2, 0.8))[1] |
+          good_quality_porprotion >= quantile(good_quality_porprotion, probs = c(0.2, 0.8))[2] ) %>%
+  arrange(good_quality_porprotion) %>%
+  kable(caption = '\\label{tab:countryodd} Origins with 20% good quality rate before and after', booktabs = TRUE,
+        linesep ="",format = "latex", digits = 2) %>%
+  kable_styling(font_size = 8, latex_options = "HOLD_position")
+
+```
+
 ```{r, eval = TRUE}
 
 #Create table showing numerical summaries for aroma, flavor, acidity, and category_two_defects separately for batches rates as good and poor for their quality.
 
 analysis %>%
   group_by(Qualityclass) %>%
-  dplyr::select(Qualityclass, aroma, flavor, acidity, category_two_defects, harvested) %>%
+  dplyr::select(Qualityclass, aroma, flavor, acidity, category_two_defects, altitude_mean_meters, harvested) %>%
   my_skim() %>%
   transmute(Variable=skim_variable, Qualityclass=Qualityclass, n=n, Mean=numeric.mean, SD=numeric.sd,
             Min=numeric.p0, Median=numeric.p50,  Max=numeric.p100,
@@ -238,6 +266,21 @@ p2 <- ggplot(data = analysis1, mapping = aes(y = defects_log)) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
+``` {r category_two_defects4, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram for category two defects and its log transformation.", fig.pos = 'H', message = FALSE}
+
+# Generate histogram to visualize category_two_defects data after log-transformation.
+
+p1 <- ggplot(data = analysis1, mapping = aes(x = category_two_defects)) +
+  geom_histogram(color = 'white')
+
+# Generate boxplot to visualize category_two_defects data after log-transformation.
+
+p2 <- ggplot(data = analysis1, mapping = aes(x = defects_log)) +
+  geom_histogram(color = 'white')
+
+grid.arrange(p1, p2, ncol = 2)
+```
+
 ``` {r altitude, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for altitude.", fig.pos = 'H', message = FALSE}
 
 # Generate histogram to visualize altitude data.
@@ -276,6 +319,21 @@ p2 <- ggplot(data = analysis2, mapping = aes(y = altitude_mean_meters)) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
+``` {r altitude4, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram for altitude befor and after removing implausuble observations.", fig.pos = 'H', message = FALSE}
+
+# Generate histogram to visualize altitude data after removing implausible observations.
+
+p1 <- ggplot(data = analysis, mapping = aes(x = altitude_mean_meters)) +
+  geom_histogram(color = 'white')
+
+# Generate boxplot to visualize altitude data after removing implausible observations.
+
+p2 <- ggplot(data = analysis2, mapping = aes(x = altitude_mean_meters)) +
+  geom_histogram(color = 'white')
+
+grid.arrange(p1, p2, ncol = 2)
+```
+
 ``` {r harvested, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for harvested.", fig.pos = 'H', message = FALSE}
 
 # Generate histogram to visualize year of harvest data.
@@ -289,6 +347,48 @@ p2 <- ggplot(data = analysis, mapping = aes(y = harvested)) +
   geom_boxplot()
 
 grid.arrange(p1, p2, ncol = 2)
+```
+
+```{r, eval = TRUE}
+#Create table showing numerical summaries for aroma, flavor, acidity, and category_two_defects separately for batches rates as good and poor for their quality.
+
+analysis2 %>%
+  group_by(Qualityclass) %>%
+  dplyr::select(Qualityclass, aroma, flavor, acidity, category_two_defects, altitude_mean_meters, harvested) %>%
+  my_skim() %>%
+  transmute(Variable=skim_variable, Qualityclass=Qualityclass, n=n, Mean=numeric.mean, SD=numeric.sd,
+            Min=numeric.p0, Median=numeric.p50,  Max=numeric.p100,
+            IQR = numeric.p75-numeric.p50) %>%
+  kable(caption = '\\label{tab:catskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+```
+
+```{r , echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Boxplots2 of countinous features on different quality class.", fig.pos = 'H', message = FALSE}
+analysis2.box <- analysis2 %>%
+  filter(aroma != 0)
+
+
+p1 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = aroma)) +
+  geom_boxplot() +
+  labs(x = 'Quality Class')
+p2 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = flavor)) +
+  geom_boxplot() +
+  labs(x = 'Quality Class')
+p3 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = acidity)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+p4 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = category_two_defects)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+p5 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = altitude_mean_meters)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+p6 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = harvested)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 6)
+
 ```
 
 ```{r country, echo = FALSE}
