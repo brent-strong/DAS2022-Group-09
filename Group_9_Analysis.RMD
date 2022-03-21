@@ -101,9 +101,9 @@ my.analysis %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
+The following boxplot is for good quality rates for each country, in which we can check if any countries have unusual high or low good quality rate.
 ```{r , echo=FALSE, fig.width = 6, fig.align = "center", fig.cap = "Boxplots of good quality rate for each country.", fig.pos = 'H', message = FALSE}
 
-#Create table to show the number of batches and the proportion of good quality for each country.
 analysis.country <- analysis %>%
   mutate(Qualityclassindicator = as.numeric(Qualityclass=="Good")) %>%
   group_by(country_of_origin) %>%
@@ -117,6 +117,7 @@ ggplot(data = analysis.country, mapping = aes(y = good_quality_porprotion)) +
 
 ```
 
+The following table filter countries and its number of batch with 20% good quality rate before and after, which proviedes more detailed information than the above boxplot.
 ```{r, eval = TRUE}
 
 analysis.country %>%
@@ -128,6 +129,8 @@ analysis.country %>%
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 ```
+
+The following table is the distribution of featers between good and poor coffee. We can check if there is obvious difference in some features between good and poor coffee.
 
 ```{r, eval = TRUE}
 
@@ -266,6 +269,8 @@ p2 <- ggplot(data = analysis1, mapping = aes(y = defects_log)) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
+The following two hists can show the effect of log-transformation on counts of type-2 defects
+
 ``` {r category_two_defects4, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram for category two defects and its log transformation.", fig.pos = 'H', message = FALSE}
 
 # Generate histogram to visualize category_two_defects data after log-transformation.
@@ -319,6 +324,8 @@ p2 <- ggplot(data = analysis2, mapping = aes(y = altitude_mean_meters)) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
+The following two hists shows the effect of remving outliers on mean altitude
+
 ``` {r altitude4, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram for altitude befor and after removing implausuble observations.", fig.pos = 'H', message = FALSE}
 
 # Generate histogram to visualize altitude data after removing implausible observations.
@@ -349,6 +356,8 @@ p2 <- ggplot(data = analysis, mapping = aes(y = harvested)) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
+The following table is the distribution of featers between good and poor coffee. We can check if there is obvious difference in some features between good and poor coffee.
+
 ```{r, eval = TRUE}
 #Create table showing numerical summaries for aroma, flavor, acidity, and category_two_defects separately for batches rates as good and poor for their quality.
 
@@ -362,6 +371,8 @@ analysis2 %>%
   kable(caption = '\\label{tab:catskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
+
+Here is 6 boxplots comparing features distribution between good and poor coffee.
 
 ```{r , echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Boxplots2 of countinous features on different quality class.", fig.pos = 'H', message = FALSE}
 analysis2.box <- analysis2 %>%
@@ -572,8 +583,9 @@ glimpse(coffee_final_nomiss)
 model_all_2 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + Honduras + Kenya + defects_log + level + year, data = coffee_final_nomiss, family = binomial(link = "logit"))
 summary(model_all_2)
 
+# I want to try could we use step AIC directly on the full model
 model_all_4 <- glm(Qualityclass ~ aroma + flavor + acidity + country_of_origin + defects_log + level + year, data = coffee_final_nomiss,family = binomial(link = "logit"))
-# has warning
+# However, the full model has warnings.
 ```
 
 ```{r}
@@ -584,12 +596,10 @@ stepAIC(model_all_2, direction = 'both')
 ```
 
 ```{r}
-
-#Find the model that best fits the data using AIC. Incomplete observations are dropped.
+# Step AIC on the full model directly has warnings.
 
 stepAIC(model_all_4, direction = 'both')
 
-# has warnings
 ```
 
 ```{r}
@@ -630,6 +640,10 @@ model_best <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + 
 summary(model_best)
 ```
 ```{r}
+# I think maybe scale of these grades and give levels for altitudes are unnecessary.
+# Hence I try to use them directly to fit the model and assess the model performance.
+# Use the origin data can make the model more interpretable. (Enyu Li)
+
 coffee_all_variables <- analysis %>%
   filter(acidity != 0 & (altitude_mean_meters < 8849 & !is.na(altitude_mean_meters)) & !is.na(harvested)) %>%
   mutate(defects_log = log(category_two_defects + 1), year = as.factor(harvested), Qualityclass = 0 + as.numeric(Qualityclass == "Good")) 
@@ -647,9 +661,12 @@ for(i in 1:length(countrylist)){
 
 head(coffee_all_variables)
 
+# I remove the intercept to test whether the slope of each country is statistically significant.
+# With the intercept, the significant depneds on the baseline country.
 model_all_variable <- glm(Qualityclass ~ country_of_origin - 1 , data = coffee_all_variables, family = binomial(link = "logit"))
 summary(model_all_variable)
 
+# Including those countries whose effect is significant.
 model_all_variable2 <- glm(Qualityclass ~ aroma + flavor + acidity + altitude_mean_meters + harvested + defects_log + Colombia + Honduras + Kenya + Malawi + Mexico + Uganda , data = coffee_all_variables, family = binomial(link = "logit"))
 summary(model_all_variable2)
 
@@ -658,15 +675,21 @@ summary(model_all_variable2)
 
 ```{r}
 
-#Find the model that best fits the data using AIC. Incomplete observations are imputed to the median value.
+#Do variable selection by AIC
 
 modelselection <- stepAIC(model_all_variable2, direction = 'both')
 summary(modelselection)
+
+# Note that the final model inclues Uganda which is not significant
+# Removing it and compare 
 
 model_all_variable3 <- glm(Qualityclass ~ aroma + flavor + acidity + defects_log + Colombia + Mexico
                            , data = coffee_all_variables, family = binomial(link = "logit"))
 
 anova(modelselection, model_all_variable3)
+
+# Not significant difference
+# The same variable selection result with my peers
 
 ```
 
@@ -841,8 +864,7 @@ mean(specificity)
 
 ```{r}
 
-#Perform 10-fold cross validation to assess the predictive performance of the model which can use best cutoff point automatically.
-#Calculate overall accuracy, sensitivity, and specificity. 
+# Assess the preformance of the model using grades without scale. (Enyu Li)
 
 set.seed(9)
 folds <- createFolds(y=coffee_all_variables$Qualityclass, k=10)
@@ -864,7 +886,8 @@ mean(accuracy)
 mean(sensitivity)
 
 mean(specificity)
-# The accuracy and sensitivity be improved a little bit.
+# Similar results with the model created with my peers
+# According to the simplicity and interpretability of the model, above model is more proper. (Enyu Li)
 ```
 
 
