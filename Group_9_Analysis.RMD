@@ -12,7 +12,6 @@ output:
 knitr::opts_chunk$set(echo = FALSE, comment = NA, message = FALSE, warning = FALSE)
 ```
 
-#Setup and Data Import
 
 ```{r libraries, echo = FALSE}
 
@@ -67,7 +66,7 @@ for(i in 1:nrow(analysis)){
 # mean(analysis$Qualityclass=="Good")
 ```
 
-#Exploratory Data Analysis
+# Exploratory Data Analysis
 
 ```{r, eval = FALSE, echo=FALSE, eval = TRUE}
 
@@ -661,7 +660,7 @@ summary(model_all_2)
 stepAIC(model_all_3, direction = 'both')
 ```
 
-##Final Model
+## Final Model
 ```{r}
 summary(model3)
 ```
