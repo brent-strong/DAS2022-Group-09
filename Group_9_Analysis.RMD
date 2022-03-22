@@ -40,7 +40,7 @@ library(ROCR)
 
 analysis <- read_csv("https://raw.githubusercontent.com/brent-strong/DAS2022-Group-09/main/dataset9.csv")
 
-glimpse(analysis)
+# glimpse(analysis)
 
 for(i in 1:nrow(analysis)){
   if(str_detect(analysis$country_of_origin[i], "Puerto Rico")){
@@ -59,14 +59,14 @@ for(i in 1:nrow(analysis)){
 
 # View(analysis)
 
-#Examine the proportion of batches that are good:
+# Examine the proportion of batches that are good:
 
-mean(analysis$Qualityclass=="Good")
+# mean(analysis$Qualityclass=="Good")
 ```
 
 #Exploratory Data Analysis
 
-```{r, echo=FALSE, eval = TRUE}
+```{r, eval = FALSE, echo=FALSE, eval = TRUE}
 
 #Create table of summary statistics for each of the continuous variables. 
 
@@ -82,7 +82,7 @@ analysis %>%
   kable_styling(font_size = 9, latex_options = "HOLD_position")
 ```
 
-```{r, eval = TRUE}
+```{r, eval = FALSE}
 
 #Create table to show the number of batches and the proportion of good quality for each country.
 
@@ -107,7 +107,7 @@ The following boxplot is for good quality rates for each country, in which we ca
 analysis.country <- analysis %>%
   mutate(Qualityclassindicator = as.numeric(Qualityclass=="Good")) %>%
   group_by(country_of_origin) %>%
-  summarise(good_quality_porprotion = round(mean(Qualityclassindicator), 2),
+  dplyr::summarise(good_quality_porprotion = round(mean(Qualityclassindicator), 2),
             number_of_batch = n())
 
 ggplot(data = analysis.country, mapping = aes(y = good_quality_porprotion)) +
@@ -117,23 +117,23 @@ ggplot(data = analysis.country, mapping = aes(y = good_quality_porprotion)) +
 
 ```
 
-The following table filter countries and its number of batch with 20% good quality rate before and after, which proviedes more detailed information than the above boxplot.
+The following table filter countries and its number of batch with 20% good quality rate before and after, which provides more detailed information than the above boxplot. The number of batch can imply the reliability. For instance, Colombia has a relatively high good quality rate with large number of batch. 
 ```{r, eval = TRUE}
 
 analysis.country %>%
   filter(good_quality_porprotion <= quantile(good_quality_porprotion, probs = c(0.2, 0.8))[1] |
           good_quality_porprotion >= quantile(good_quality_porprotion, probs = c(0.2, 0.8))[2] ) %>%
   arrange(good_quality_porprotion) %>%
-  kable(caption = '\\label{tab:countryodd} Origins with 20% good quality rate before and after', booktabs = TRUE,
+  kable(caption = '\\label{tab:countryodd} Origins with twenty percent good quality rate before and after', booktabs = TRUE,
         linesep ="",format = "latex", digits = 2) %>%
   kable_styling(font_size = 8, latex_options = "HOLD_position")
 
 ```
 
-The following table is the distribution of featers between good and poor coffee. We can check if there is obvious difference in some features between good and poor coffee.
+The following table is the distribution of features between coffee in good and poor quality. We can check if there is any obvious difference in some features.
 
 ```{r, eval = TRUE}
-
+my_skim <- skim_with(base = sfl(n = length))
 #Create table showing numerical summaries for aroma, flavor, acidity, and category_two_defects separately for batches rates as good and poor for their quality.
 
 analysis %>%
@@ -147,7 +147,7 @@ analysis %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
-```{r , echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Boxplots of countinous features on different quality class.", fig.pos = 'H', message = FALSE}
+```{r ,eval=FALSE, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Boxplots of countinous features on different quality class.", fig.pos = 'H', message = FALSE}
 analysis.box <- analysis %>%
   filter(aroma != 0)
 
@@ -169,7 +169,7 @@ grid.arrange(p1, p2, p3, p4, ncol = 4)
 
 ```
 
-```{r aroma, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for aroma.", fig.pos = 'H', message = FALSE}
+```{r aroma, eval = FALSE, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for aroma.", fig.pos = 'H', message = FALSE}
 
 #Generate histogram to visualize aroma data.
 
@@ -186,7 +186,7 @@ grid.arrange(p1, p2, ncol = 2)
 #Single observation with a value of 0 is odd.
 ```
 
-```{r flavor, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for flavor.", fig.pos = 'H', message = FALSE}
+```{r flavor,eval=FALSE, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for flavor.", fig.pos = 'H', message = FALSE}
 
 #Generate histogram to visualize flavor data.
 
@@ -204,7 +204,7 @@ grid.arrange(p1, p2, ncol = 2)
 ```
 
 
-```{r acidity, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for acidity.", fig.pos = 'H', message = FALSE}
+```{r acidity,eval=FALSE, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for acidity.", fig.pos = 'H', message = FALSE}
 
 #Generate histogram to visualize acidity data.
 
@@ -226,7 +226,7 @@ analysis %>%
 #Will delete the observation in the formal analysis. 
 ```
 
-```{r category_two_defects, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for category two defects.", fig.pos = 'H', message = FALSE}
+```{r category_two_defects,eval=FALSE, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for category two defects.", fig.pos = 'H', message = FALSE}
 
 #Generate histogram to visualize category_two_defects data.
 
@@ -243,7 +243,7 @@ grid.arrange(p1, p2, ncol = 2)
 #The data is right skewed, so a log-transformation will be applied.
 ```
 
-```{r category_two_defects2, echo = FALSE}
+```{r category_two_defects2,eval=FALSE, echo = FALSE}
 
 # Apply log(x+1) transformation and then visualize the data set.
 
@@ -254,7 +254,7 @@ glimpse(analysis1)
   
 ```
 
-``` {r category_two_defects3, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for category two defects after log transformation.", fig.pos = 'H', message = FALSE}
+``` {r category_two_defects3,eval = FALSE, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for category two defects after log transformation.", fig.pos = 'H', message = FALSE}
 
 # Generate histogram to visualize category_two_defects data after log-transformation.
 
@@ -269,10 +269,9 @@ p2 <- ggplot(data = analysis1, mapping = aes(y = defects_log)) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
-The following two hists can show the effect of log-transformation on counts of type-2 defects
 
-``` {r category_two_defects4, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram for category two defects and its log transformation.", fig.pos = 'H', message = FALSE}
-
+``` {r category_two_defects4, eval = FALSE, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram for category two defects and its log transformation.", fig.pos = 'H', message = FALSE}
+# The following two hists can show the effect of log-transformation on counts of type-2 defects
 # Generate histogram to visualize category_two_defects data after log-transformation.
 
 p1 <- ggplot(data = analysis1, mapping = aes(x = category_two_defects)) +
@@ -300,6 +299,7 @@ geom_boxplot()
 
 grid.arrange(p1, p2, ncol = 2)
 ```
+There are several observations with extremly high altitude which are impossible. Hence, delete observations which have altitude higher than Mt. Everest.
 
 ```{r altitude2, echo = FALSE}
 
@@ -324,7 +324,7 @@ p2 <- ggplot(data = analysis2, mapping = aes(y = altitude_mean_meters)) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
-The following two hists shows the effect of remving outliers on mean altitude
+The following two histograms comparing distributions of altitude before and after removing implausible observations.
 
 ``` {r altitude4, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram for altitude befor and after removing implausuble observations.", fig.pos = 'H', message = FALSE}
 
@@ -341,7 +341,7 @@ p2 <- ggplot(data = analysis2, mapping = aes(x = altitude_mean_meters)) +
 grid.arrange(p1, p2, ncol = 2)
 ```
 
-``` {r harvested, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for harvested.", fig.pos = 'H', message = FALSE}
+``` {r harvested,eval = FALSE, echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Histogram and boxplot for harvested.", fig.pos = 'H', message = FALSE}
 
 # Generate histogram to visualize year of harvest data.
 
@@ -368,11 +368,11 @@ analysis2 %>%
   transmute(Variable=skim_variable, Qualityclass=Qualityclass, n=n, Mean=numeric.mean, SD=numeric.sd,
             Min=numeric.p0, Median=numeric.p50,  Max=numeric.p100,
             IQR = numeric.p75-numeric.p50) %>%
-  kable(caption = '\\label{tab:catskim} Summary statistics of the sepal length by species of irises', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable(caption = '\\label{tab:catskim} Summary statistics of features of good and poor coffee', booktabs = TRUE, linesep = "", digits = 2) %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
-Here is 6 boxplots comparing features distribution between good and poor coffee.
+Here is 6 box-plots comparing features distribution between good and poor coffee.
 
 ```{r , echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Boxplots2 of countinous features on different quality class.", fig.pos = 'H', message = FALSE}
 analysis2.box <- analysis2 %>%
@@ -402,7 +402,7 @@ grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 6)
 
 ```
 
-```{r country, echo = FALSE}
+```{r, echo = FALSE}
 
 # glimpse(analysis)
 
@@ -415,7 +415,9 @@ analysis3 <- analysis %>%
   arrange(desc(proportion))
 
 # View(analysis3)
+```
 
+```{r country, eval=FALSE, echo = FALSE}
 #Create a bar chart to visualize the proportion of batches that were good for each country. Split up the visualizations into four groups. 
 
 p1<-ggplot(data = analysis3[1:9,], mapping = aes(x = country_of_origin, y = proportion)) +
@@ -440,8 +442,9 @@ grid.arrange(p1, p2, p3, p4, nrow = 4)
 # Create the final data set. Remove observations that have implausible values for at least one of the variables. Standardize aroma, flavor, acidity, and altitude. Apply a log(x+1) transformation to category_two_defects variable. Turn Qualityclass into an indicator variable so that it can be used in the logistic regression analysis. Remove unneeded variables.
 
 coffee_final <- analysis %>%
-  filter(acidity != 0 & (altitude_mean_meters < 8849 | is.na(altitude_mean_meters))) %>%
-  mutate(aroma = scale(aroma), flavor=scale(flavor), acidity=scale(acidity), defects_log = log(category_two_defects + 1), year = as.factor(harvested), Qualityclass = 0 + as.numeric(Qualityclass == "Good")) 
+  na.omit() %>%
+  filter(altitude_mean_meters < 8849) %>%
+  mutate(year = as.factor(harvested), Qualityclass = 0 + as.numeric(Qualityclass == "Good")) 
 
 ##divide 3 levels for the altitude based on review of the literature @hameed_coffee_2020
 coffee_final$level_1 <- ifelse(coffee_final$altitude_mean_meters<900,1,0)
@@ -453,22 +456,18 @@ coffee_final <- coffee_final %>%
 # Finally, create the final data set by removing any unncessary variables. 
 
 coffee_final <- coffee_final %>%
-  dplyr::select(country_of_origin, aroma, flavor, acidity, defects_log, year, level, Qualityclass)
+  dplyr::select(country_of_origin, aroma, flavor, acidity, category_two_defects, year, level, Qualityclass)
 
 # View the final data set and make sure that the standardizations and transformation were appropriately applied.
 
-glimpse(coffee_final)
+# glimpse(coffee_final)
 
 # skim_without_charts(coffee_final)
 
-#Determine the number of observations by year.
 
-coffee_final %>%
-  group_by(year) %>%
-  summarize(n=n())
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 # We generate a table to have a look at the proportion and counts for both Good and Poor quality based on the country of origin and harvested years respectively.
 
@@ -485,7 +484,7 @@ coffee_final %>%
   adorn_ns()
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 # Plot a bar chart to get intuition of whether the quality of coffee is influenced by the year of harvesting.
 
@@ -504,21 +503,31 @@ model_level <- glm(Qualityclass ~ level - 1, data = coffee_final,family = binomi
 summary(model_level)
 ```
 
+If the level of altitude is the only explanatory variable in the model, the effect of three levels are all statistically significant. In detail, high altitude has a positive influence on the quality of coffee.
+
 ```{r}
 
 #Fit model with only year as a predictor to get an idea of how quality differs by year of harvest.
 
-model_year <- glm(Qualityclass ~ year, data = coffee_final,family = binomial(link = "logit"))
+model_year <- glm(Qualityclass ~ year - 1, data = coffee_final,family = binomial(link = "logit"))
 summary(model_year)
+
+coffee_final$year2010 <- ifelse(coffee_final$year == 2010,1,0)
+coffee_final$year2011 <- ifelse(coffee_final$year == 2011,1,0)
+coffee_final$year2012 <- ifelse(coffee_final$year == 2012,1,0)
 ```
+
+If harvested year is the only explanatory variable in the model, the effects of year 2010, 2011 and 2012 are statistically significant. Coffee harvested in year 2012 has a higher odds ratio. Coffee harvested in year 2010 and 2011 has a lower odds ratio.
 
 ```{r}
 
 #Fit model with only country as a predictor to get an idea of how quality differs by country of harvest.
 
-model_country <- glm(Qualityclass ~ country_of_origin, data = coffee_final,family = binomial(link = "logit"))
+model_country <- glm(Qualityclass ~ country_of_origin - 1, data = coffee_final,family = binomial(link = "logit"))
 summary(model_country)
 ```
+
+If the country of origin is the only explanatory variable, Colombia, Mexico, Honduras, Kenya, Malawi, Uganda have statistically significant effect on the odds ratio.
 
 ```{r}
 
@@ -528,17 +537,19 @@ coffee_final$Colombia <- ifelse(coffee_final$country_of_origin == 'Colombia',1,0
 coffee_final$Mexico <- ifelse(coffee_final$country_of_origin == 'Mexico',1,0)
 coffee_final$Honduras <- ifelse(coffee_final$country_of_origin == 'Honduras',1,0)
 coffee_final$Kenya <- ifelse(coffee_final$country_of_origin == 'Kenya',1,0)
+coffee_final$Malawi <- ifelse(coffee_final$country_of_origin == 'Malawi',1,0)
+coffee_final$Uganda <- ifelse(coffee_final$country_of_origin == 'Uganda',1,0)
 ```
 
 ```{r}
 
 #Fit model with new indicator variables for important countries to compare the quality between them.
 
-model_co_4 <- glm(Qualityclass ~ Colombia + Mexico + Honduras + Kenya-1, data = coffee_final,family = binomial(link = "logit"))
+model_co_4 <- glm(Qualityclass ~ Colombia + Mexico + Honduras + Kenya + Malawi + Uganda - 1, data = coffee_final,family = binomial(link = "logit"))
 summary(model_co_4)
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 #Fit model with only country and year.
 
@@ -546,7 +557,7 @@ model_cn_ye <- glm(Qualityclass ~ country_of_origin + year, data = coffee_final,
 summary(model_cn_ye)
 ```
 
-```{r,warning=FALSE}
+```{r,warning=FALSE, eval=FALSE}
 
 #Fit model with indicators for important countries and altitude level.
 
@@ -555,7 +566,7 @@ summary(model_al_co)
 ```
 
 
-```{r,warning=FALSE}
+```{r,warning=FALSE, eval=FALSE}
 
 #Fit model with altitude level, country, and year with no intercept.
 
@@ -563,15 +574,16 @@ model_al_co <- glm(Qualityclass ~ level + country_of_origin + year - 1, data = c
 summary(model_al_co)
 ```
 
+The following is the model considering all possible expalntatory variables.
 ```{r}
 
 #Fit logistic regression model with all possible predictors. Will need to be simplified given how many countries there are. 
 
-model_all <- glm(Qualityclass ~ aroma + flavor + acidity + country_of_origin + defects_log + level + year, data = coffee_final,family = binomial(link = "logit"))
+model_all <- glm(Qualityclass ~ aroma + flavor + acidity + country_of_origin + category_two_defects + level + year, data = coffee_final,family = binomial(link = "logit"))
 summary(model_all)
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 #Create data set with incomplete observations (i.e., those missing any data) removed so that stepwise selection using AIC can be performed.
 
@@ -588,21 +600,42 @@ model_all_4 <- glm(Qualityclass ~ aroma + flavor + acidity + country_of_origin +
 # However, the full model has warnings.
 ```
 
-```{r}
 
+
+```{r, warning=FALSE}
+model_all_significant <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + Honduras + Kenya + Malawi + Uganda + category_two_defects + level + year2010 + year2011 + year2012, data = coffee_final,family = binomial(link = "logit"))
+
+summary(model_all_significant)
 #Find the model that best fits the data using AIC. Incomplete observations are dropped.
 
-stepAIC(model_all_2, direction = 'both')
+model_slected <- stepAIC(model_all_significant, direction = 'both')
+summary(model_slected)
 ```
 
+Firstly, we conduct a model with all significant explanatory variables and use step_AIC to select variables.
+In the selected model, two terms are not significant. Then, we try to delete term Uganda which has the highest p-value.
+
 ```{r}
-# Step AIC on the full model directly has warnings.
+model2 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + category_two_defects, data = coffee_final,family = binomial(link = "logit"))
 
-stepAIC(model_all_4, direction = 'both')
+model3 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico, data = coffee_final,family = binomial(link = "logit"))
 
+summary(model2)
+
+summary(model3)
+
+anova(model_slected, model2, model3)
+
+qchisq(df = 1, p = 0.95)
 ```
 
-```{r}
+After deleting Uganda, category_two_defects is still not significant. Hence, it was deleted.
+And we use anova to compare three models.
+There isn't statistically significant difference among them.
+Hence, it is resonable to delect them and get a simple model.
+
+
+```{r, eval=FALSE}
 
 #Create data set with incomplete observations imputed to the most median value.
 
@@ -623,7 +656,7 @@ model_all_3 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico +
 summary(model_all_2)
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 #Find the model that best fits the data using AIC. Incomplete observations are imputed to the median value.
 
@@ -632,7 +665,7 @@ stepAIC(model_all_3, direction = 'both')
 
 ##Final Model
 
-```{r}
+```{r, eval=FALSE}
 
 #The same model was selected using both approaches. Fit this final model to the full data set since neither year nor altitude level are included (the variables with missing values).
 
@@ -673,7 +706,7 @@ summary(model_all_variable2)
 
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 #Do variable selection by AIC
 
@@ -693,7 +726,7 @@ anova(modelselection, model_all_variable3)
 
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 #Perform 10-fold cross validation to assess the predictive performance of the model. Calculate overall accuracy, sensitivity, and specificity. 
 
@@ -721,7 +754,7 @@ mean(specificity)
 
 ##Sensitivity Analysis
 
-```{r}
+```{r, eval=FALSE}
 
 #Fit a linear mixed model with a random intercept for country. Included all other predictors from the final, best model.
 
@@ -730,7 +763,7 @@ data=coffee_final, family=binomial(link="logit"))
 summary(glmm1, corr=FALSE)
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 #Perform 10-fold cross validation to assess the predictive performance of the model without country (i.e., predictions based on linear mixed model). Calculate overall accuracy, sensitivity, and specificity. 
 
@@ -759,7 +792,7 @@ mean(specificity)
 ```
 
 ## Classfication boundry
-```{r}
+```{r, eval=FALSE}
 coffee_final$prid <- predict(model_best, coffee_final, type='response')
 score <- prediction(coffee_final$prid, coffee_final$Qualityclass)
 perf <- performance(score, 'tpr', 'fpr')
@@ -772,7 +805,7 @@ ggplot(perfd, aes(x= x, y=y)) + geom_line() +
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 cutoffs <- data.frame(cut=perf@alpha.values[[1]], 
                       fpr=perf@x.values[[1]], 
                       tpr=perf@y.values[[1]],
@@ -783,7 +816,7 @@ bestcut
 
 ```
 
-```{r}
+```{r, eval=FALSE}
 cutoffs <- data.frame(cut=perf@alpha.values[[1]], 
                       fpr=perf@x.values[[1]], 
                       tpr=perf@y.values[[1]],
@@ -793,7 +826,7 @@ head(cutoffs[order(cutoffs$dif, decreasing = T), ])
 
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 #Perform 10-fold cross validation to assess the predictive performance of the model which use the best cutoff point by the whole dataset.
 # Calculate overall accuracy, sensitivity, and specificity. 
@@ -820,7 +853,7 @@ mean(sensitivity)
 mean(specificity)
 ```
 
-```{r}
+```{r, eval=FALSE}
 # Here is a function which can find the best cutoff point automatically
 findbestcut <- function(model, data){
   data$prid <- predict(model, data, type='response')
@@ -833,7 +866,7 @@ findbestcut <- function(model, data){
 
 ```
 
-```{r}
+```{r, eval=FALSE}
 
 #Perform 10-fold cross validation to assess the predictive performance of the model which can use best cutoff point automatically.
 #Calculate overall accuracy, sensitivity, and specificity. 
@@ -862,7 +895,7 @@ mean(specificity)
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 
 # Assess the preformance of the model using grades without scale. (Enyu Li)
 
@@ -891,7 +924,7 @@ mean(specificity)
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 
 #Fit a linear mixed model with a random intercept for country. Included all other predictors from the final, best model.
 
