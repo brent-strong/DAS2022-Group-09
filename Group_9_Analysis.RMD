@@ -381,22 +381,22 @@ analysis2.box <- analysis2 %>%
   filter(aroma != 0)
 
 
-p1 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = aroma)) +
+p1 <- ggplot(data = analysis, mapping = aes(x = factor(Qualityclass), y = aroma)) +
   geom_boxplot() +
   labs(x = 'Quality Class')
-p2 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = flavor)) +
+p2 <- ggplot(data = analysis, mapping = aes(x = factor(Qualityclass), y = flavor)) +
   geom_boxplot() +
   labs(x = 'Quality Class')
-p3 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = acidity)) +
+p3 <- ggplot(data = analysis, mapping = aes(x = factor(Qualityclass), y = acidity)) +
   geom_boxplot()+
   labs(x = 'Quality Class')
-p4 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = category_two_defects)) +
+p4 <- ggplot(data = analysis, mapping = aes(x = factor(Qualityclass), y = category_two_defects)) +
   geom_boxplot()+
   labs(x = 'Quality Class')
-p5 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = altitude_mean_meters)) +
+p5 <- ggplot(data = analysis, mapping = aes(x = factor(Qualityclass), y = altitude_mean_meters)) +
   geom_boxplot()+
   labs(x = 'Quality Class')
-p6 <- ggplot(data = analysis2.box, mapping = aes(x = factor(Qualityclass), y = harvested)) +
+p6 <- ggplot(data = analysis, mapping = aes(x = factor(Qualityclass), y = harvested)) +
   geom_boxplot()+
   labs(x = 'Quality Class')
 
@@ -466,6 +466,35 @@ coffee_final <- coffee_final %>%
 
 # skim_without_charts(coffee_final)
 
+
+```
+
+```{r , echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Boxplots of countinous features on different quality class after data cleaning.", fig.pos = 'H', message = FALSE}
+coffee_final2 <- analysis %>%
+  na.omit() %>%
+  filter(altitude_mean_meters < 8849)
+
+
+p1 <- ggplot(data = coffee_final2, mapping = aes(x = factor(Qualityclass), y = aroma)) +
+  geom_boxplot() +
+  labs(x = 'Quality Class')
+p2 <- ggplot(data = coffee_final2, mapping = aes(x = factor(Qualityclass), y = flavor)) +
+  geom_boxplot() +
+  labs(x = 'Quality Class')
+p3 <- ggplot(data = coffee_final2, mapping = aes(x = factor(Qualityclass), y = acidity)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+p4 <- ggplot(data = coffee_final2, mapping = aes(x = factor(Qualityclass), y = category_two_defects)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+p5 <- ggplot(data = coffee_final2, mapping = aes(x = factor(Qualityclass), y = altitude_mean_meters)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+p6 <- ggplot(data = coffee_final2, mapping = aes(x = factor(Qualityclass), y = harvested)) +
+  geom_boxplot()+
+  labs(x = 'Quality Class')
+
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 6)
 
 ```
 
@@ -672,7 +701,7 @@ $$\mathbb{I}_{\mbox{Colombia}}(x)=\left\{ \begin{array}{ll} 1 ~~~ \mbox{if Count
 $$\mathbb{I}_{\mbox{Mexico}}(x)=\left\{ \begin{array}{ll} 1 ~~~ \mbox{if Country of region of} ~ x \mbox{th observation is Mexico},\\ 0 ~~~ \mbox{Otherwise}.\\ \end{array} \right.$$
 The following is the fitted model.
 
-$$\ln(\frac{p_i}{1-p_i}) = `r round(coef(model3), 2)[1]` + `r round(coef(model3), 2)[2]` \cdot aroma_i+ `r round(coef(model3), 2)[3]` \cdot flavor_i+ `r round(coef(model3), 2)[4]` \cdot acidity_i+ `r round(coef(model3), 2)[5]` \cdot \mathbb{I}_{\mbox{Colombia}}(x)+ `r round(coef(model3), 2)[6]` \cdot \mathbb{I}_{\mbox{Mexico}}(x)$$
+$$\ln(\frac{p_i}{1-p_i}) = `r round(coef(model3), 2)[1]` + `r round(coef(model3), 2)[2]` \cdot aroma_i+ `r round(coef(model3), 2)[3]` \cdot flavor_i+ `r round(coef(model3), 2)[4]` \cdot acidity_i+ `r round(coef(model3), 2)[5]` \cdot \mathbb{I}_{\mbox{Colombia}}(x) `r round(coef(model3), 2)[6]` \cdot \mathbb{I}_{\mbox{Mexico}}(x)$$
 
 ```{r, eval=FALSE}
 # I think maybe scale of these grades and give levels for altitudes are unnecessary.
