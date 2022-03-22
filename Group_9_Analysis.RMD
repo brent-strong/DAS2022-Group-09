@@ -2,7 +2,10 @@
 title: "Group_9_Analysis"
 author: "Brent Strong, Enyu Li, Haotian Wang, Honjin Ren, Mu He"
 date: "3/7/2022"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -617,22 +620,17 @@ In the selected model, two terms are not significant. Then, we try to delete ter
 
 ```{r}
 model2 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + category_two_defects, data = coffee_final,family = binomial(link = "logit"))
-
 model3 <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico, data = coffee_final,family = binomial(link = "logit"))
-
 summary(model2)
-
 summary(model3)
-
 anova(model_slected, model2, model3)
-
 qchisq(df = 1, p = 0.95)
 ```
 
 After deleting Uganda, category_two_defects is still not significant. Hence, it was deleted.
 And we use anova to compare three models.
 There isn't statistically significant difference among them.
-Hence, it is resonable to delect them and get a simple model.
+Hence, it is reasonable to delete them and get a simple model.
 
 
 ```{r, eval=FALSE}
@@ -664,15 +662,20 @@ stepAIC(model_all_3, direction = 'both')
 ```
 
 ##Final Model
+```{r}
+summary(model3)
+```
+
+$$\ln(\frac{p_i}{1-p_i}) = \alpha + \beta_1 \cdot aroma_i+ \beta_2 \cdot flavor_i+ \beta_3 \cdot acidity_i+ \beta_4 \cdot \mathbb{I}_{\mbox{Colombia}}(x)+ \beta_5 \cdot \mathbb{I}_{\mbox{Mexico}}(x)$$
+
+$$\mathbb{I}_{\mbox{Colombia}}(x)=\left\{ \begin{array}{ll} 1 ~~~ \mbox{if Country of region of} ~ x \mbox{th observation is Colombia},\\ 0 ~~~ \mbox{Otherwise}.\\ \end{array} \right. $$
+
+$$\mathbb{I}_{\mbox{Mexico}}(x)=\left\{ \begin{array}{ll} 1 ~~~ \mbox{if Country of region of} ~ x \mbox{th observation is Mexico},\\ 0 ~~~ \mbox{Otherwise}.\\ \end{array} \right.$$
+The following is the fitted model.
+
+$$\ln(\frac{p_i}{1-p_i}) = `r round(coef(model3), 2)[1]` + `r round(coef(model3), 2)[2]` \cdot aroma_i+ `r round(coef(model3), 2)[3]` \cdot flavor_i+ `r round(coef(model3), 2)[4]` \cdot acidity_i+ `r round(coef(model3), 2)[5]` \cdot \mathbb{I}_{\mbox{Colombia}}(x)+ `r round(coef(model3), 2)[6]` \cdot \mathbb{I}_{\mbox{Mexico}}(x)$$
 
 ```{r, eval=FALSE}
-
-#The same model was selected using both approaches. Fit this final model to the full data set since neither year nor altitude level are included (the variables with missing values).
-
-model_best <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log, data = coffee_final,family = binomial(link = "logit"))
-summary(model_best)
-```
-```{r}
 # I think maybe scale of these grades and give levels for altitudes are unnecessary.
 # Hence I try to use them directly to fit the model and assess the model performance.
 # Use the origin data can make the model more interpretable. (Enyu Li)
@@ -726,7 +729,7 @@ anova(modelselection, model_all_variable3)
 
 ```
 
-```{r, eval=FALSE}
+```{r, warning=FALSE}
 
 #Perform 10-fold cross validation to assess the predictive performance of the model. Calculate overall accuracy, sensitivity, and specificity. 
 
@@ -738,7 +741,7 @@ specificity <- as.numeric()
 for(i in 1:10){
   fold_test <- coffee_final[folds[[i]],]
   fold_train <- coffee_final[-folds[[i]],]
-  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log,family = binomial(link = logit), data =fold_train )
+  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico,family = binomial(link = logit), data =fold_train )
   fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
   fold_predict <- ifelse(fold_predict >= 0.5, 1, 0)
   accuracy[i] <- mean(fold_predict == fold_test[,8])
@@ -751,14 +754,16 @@ mean(sensitivity)
 
 mean(specificity)
 ```
+The accuracy of our final model is `r round(mean(accuracy), 2)`.
+The sensitivity of our final model is `r round(mean(sensitivity), 2)`.
+The specificity of our final model is `r round(mean(specificity), 2)`.
 
-##Sensitivity Analysis
 
 ```{r, eval=FALSE}
 
 #Fit a linear mixed model with a random intercept for country. Included all other predictors from the final, best model.
 
-glmm1 <- glmer(Qualityclass ~ 1 + aroma + flavor + acidity + defects_log + (1|country_of_origin),
+glmm1 <- glmer(Qualityclass ~ 1 + aroma + flavor + acidity +  (1|country_of_origin),
 data=coffee_final, family=binomial(link="logit"))
 summary(glmm1, corr=FALSE)
 ```
@@ -792,8 +797,8 @@ mean(specificity)
 ```
 
 ## Classfication boundry
-```{r, eval=FALSE}
-coffee_final$prid <- predict(model_best, coffee_final, type='response')
+```{r}
+coffee_final$prid <- predict(model3, coffee_final, type='response')
 score <- prediction(coffee_final$prid, coffee_final$Qualityclass)
 perf <- performance(score, 'tpr', 'fpr')
 auc <- performance(score, 'auc')
@@ -853,7 +858,7 @@ mean(sensitivity)
 mean(specificity)
 ```
 
-```{r, eval=FALSE}
+```{r}
 # Here is a function which can find the best cutoff point automatically
 findbestcut <- function(model, data){
   data$prid <- predict(model, data, type='response')
@@ -866,7 +871,7 @@ findbestcut <- function(model, data){
 
 ```
 
-```{r, eval=FALSE}
+```{r, warning=FALSE}
 
 #Perform 10-fold cross validation to assess the predictive performance of the model which can use best cutoff point automatically.
 #Calculate overall accuracy, sensitivity, and specificity. 
@@ -879,7 +884,7 @@ specificity <- as.numeric()
 for(i in 1:10){
   fold_test <- coffee_final[folds[[i]],]
   fold_train <- coffee_final[-folds[[i]],]
-  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico + defects_log,family = binomial(link = logit), data =fold_train )
+  fold_pre <- glm(Qualityclass ~ aroma + flavor + acidity + Colombia + Mexico,family = binomial(link = logit), data =fold_train )
   fold_predict <- predict(fold_pre,type='response',newdata=fold_test)
   fold_predict <- ifelse(fold_predict >= findbestcut(fold_pre, fold_train), 1, 0)
   accuracy[i] <- mean(fold_predict == fold_test[,8])
@@ -893,6 +898,10 @@ mean(sensitivity)
 mean(specificity)
 # The accuracy and sensitivity be improved a little bit.
 ```
+After adjusting the classfication boundry.
+The accuracy of our final model is `r round(mean(accuracy), 2)`.
+The sensitivity of our final model is `r round(mean(sensitivity), 2)`.
+The specificity of our final model is `r round(mean(specificity), 2)`.
 
 
 ```{r, eval=FALSE}
