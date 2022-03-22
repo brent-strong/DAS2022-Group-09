@@ -703,6 +703,27 @@ The following is the fitted model.
 
 $$\ln(\frac{p_i}{1-p_i}) = `r round(coef(model3), 2)[1]` + `r round(coef(model3), 2)[2]` \cdot aroma_i+ `r round(coef(model3), 2)[3]` \cdot flavor_i+ `r round(coef(model3), 2)[4]` \cdot acidity_i+ `r round(coef(model3), 2)[5]` \cdot \mathbb{I}_{\mbox{Colombia}}(x) `r round(coef(model3), 2)[6]` \cdot \mathbb{I}_{\mbox{Mexico}}(x)$$
 
+Generate a summary table containing confidence intervals of estimated parameters of final model.
+
+```{r}
+modelsumm <- summary(model3)
+CI <- confint(model3)
+citable <- data.frame(modelsumm$coefficients) %>%
+  round(2)
+colnames(citable)[1] <- "estimate" 
+colnames(citable)[2] <- "std_error"
+colnames(citable)[3] <- "statistic"
+colnames(citable)[4] <- "p_value"
+citable$lower_ci <- CI[,1]
+citable$upper_ci <- CI[,2]
+citable$est_exp <- exp(citable$estimate)
+citable$lower_ci_exp <- exp(CI[,1])
+citable$upper_ci_exp <- exp(CI[,2])
+citable <- citable[,-3]
+knitr::kable(citable, caption = '\\label{tab:ci} confidence interval of estimated parameters', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+```
+
 ```{r, eval=FALSE}
 # I think maybe scale of these grades and give levels for altitudes are unnecessary.
 # Hence I try to use them directly to fit the model and assess the model performance.
@@ -756,6 +777,8 @@ anova(modelselection, model_all_variable3)
 # The same variable selection result with my peers
 
 ```
+
+Based on the model we built, we try to use 10-folds cross validation to test the validity of our final model. In the validation we prefer three criteria: accuracy, sensitivity and specificity.
 
 ```{r, warning=FALSE}
 
@@ -825,6 +848,9 @@ mean(specificity)
 ```
 
 ## Classfication boundry
+
+
+
 ```{r}
 coffee_final$prid <- predict(model3, coffee_final, type='response')
 score <- prediction(coffee_final$prid, coffee_final$Qualityclass)
@@ -926,7 +952,7 @@ mean(sensitivity)
 mean(specificity)
 # The accuracy and sensitivity be improved a little bit.
 ```
-After adjusting the classfication boundry.
+After adjusting the classification boundary.
 The accuracy of our final model is `r round(mean(accuracy), 2)`.
 The sensitivity of our final model is `r round(mean(sensitivity), 2)`.
 The specificity of our final model is `r round(mean(specificity), 2)`.
