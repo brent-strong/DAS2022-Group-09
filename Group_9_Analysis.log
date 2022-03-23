@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2022.3.6)  23 MAR 2022 12:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2022.3.6)  23 MAR 2022 13:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -643,9 +643,13 @@ l.926 \begin{verbatim}
 <Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf, id=153, 469.755pt x 325.215pt>
 File: Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf Graphic file (type pdf)
 <use Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf>
-Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf  used on input line 946.
+Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf  used on input line 951.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[17 <./Group_9_Analysis_files/figure-latex/unnamed-chunk-34-1.pdf>] [18 <./Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf>] (./Group_9_Analysis.aux)
+[17pdfTeX warning (ext4): destination with the same identifier (name{table.6}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.953 \begin{verbatim}
+                       <./Group_9_Analysis_files/figure-latex/unnamed-chunk-34-1.pdf>] [18 <./Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf>] (./Group_9_Analysis.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
@@ -653,18 +657,18 @@ Package rerunfilecheck Info: File `Group_9_Analysis.out' has not changed.
 (rerunfilecheck)             Checksum: D9672CEF85C7348A874EB6DEA6D15E87;710.
  ) 
 Here is how much of TeX's memory you used:
- 12281 strings out of 480236
- 197346 string characters out of 5893969
- 493485 words of memory out of 5000000
- 29956 multiletter control sequences out of 15000+600000
+ 12284 strings out of 480236
+ 197390 string characters out of 5893969
+ 493637 words of memory out of 5000000
+ 29958 multiletter control sequences out of 15000+600000
  521977 words of font info for 74 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  60i,9n,63p,313b,469s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}<c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/Users/r4718/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Group_9_Analysis.pdf (18 pages, 326555 bytes).
+Output written on Group_9_Analysis.pdf (18 pages, 326458 bytes).
 PDF statistics:
- 247 PDF objects out of 1000 (max. 8388607)
- 182 compressed objects within 2 object streams
- 38 named destinations out of 1000 (max. 500000)
+ 248 PDF objects out of 1000 (max. 8388607)
+ 183 compressed objects within 2 object streams
+ 39 named destinations out of 1000 (max. 500000)
  73 words of extra memory for PDF output out of 10000 (max. 10000000)
 
