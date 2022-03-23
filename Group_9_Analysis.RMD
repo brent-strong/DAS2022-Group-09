@@ -452,9 +452,6 @@ colnames(citable)[3] <- "statistic"
 colnames(citable)[4] <- "P value"
 citable$Lower_ci <- CI[,1]
 citable$Upper_ci <- CI[,2]
-citable$Est_exp <- exp(citable$Estimate)
-citable$Lower_ci_exp <- exp(CI[,1])
-citable$Upper_ci_exp <- exp(CI[,2])
 citable <- citable[,-3]
 knitr::kable(citable, caption = '\\label{tab:ci} confidence interval of estimated parameters', booktabs = TRUE, linesep = "", digits = 2) %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
