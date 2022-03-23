@@ -261,6 +261,7 @@ coffee_final <- coffee_final %>%
 
 ```
 
+
 Here is 6 box-plots comparing features distribution between good and poor coffee after data cleaning
 
 ```{r , echo=FALSE, fig.width = 13, fig.align = "center", fig.cap = "Boxplots of countinous features on different quality class after data cleaning.", fig.pos = 'H', message = FALSE}
@@ -289,6 +290,24 @@ p6 <- ggplot(data = coffee_final2, mapping = aes(x = factor(Qualityclass), y = h
   labs(x = 'Quality Class')
 
 grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 6)
+
+```
+
+```{r , echo=FALSE, fig.width = 8, fig.align = "center", fig.cap = "The good and poor quality rates for each altitude level.", fig.pos = 'H', message = FALSE}
+coffee_final2 <- analysis %>%
+  na.omit() %>%
+  filter(altitude_mean_meters < 8849) %>%
+  mutate(year = as.factor(harvested))
+
+coffee_final2$level_1 <- ifelse(coffee_final2$altitude_mean_meters<900,1,0)
+coffee_final2$level_2 <- ifelse(coffee_final2$altitude_mean_meters>=900 & coffee_final2$altitude_mean_meters<=1200,1,0)
+coffee_final2$level_3 <- ifelse(coffee_final2$altitude_mean_meters>1200,1,0)
+coffee_final2 <- coffee_final2 %>%
+  mutate(level = as.character(level_1 + level_2*2 + level_3*3))
+
+ggplot(coffee_final2, aes(x= level,  y = ..prop.., group = as.factor(Qualityclass), fill = Qualityclass)) + 
+    geom_bar(position="dodge", stat="count") +
+    labs(y = "Proportion")
 
 ```
 
