@@ -871,7 +871,11 @@ co <- rbind(round(coef(model3),2),round(exp(coef(model3)),2))
 row.names(co) <- c("coefficients","exp(coefficients)")
 
 
-kable(co)
+
+co %>%
+  knitr::kable(caption = '\\label{tab:summaries} Regression coefficients and exponentiated coefficients.', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+
 ```
 
 ```{r}
