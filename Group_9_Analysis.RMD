@@ -857,11 +857,32 @@ score <- prediction(coffee_final$prid, coffee_final$Qualityclass)
 perf <- performance(score, 'tpr', 'fpr')
 auc <- performance(score, 'auc')
 perfd <- data.frame(x=perf@x.values[1][[1]], y=perf@y.values[1][[1]])
-ggplot(perfd, aes(x= x, y=y)) + geom_line() +
+ggplot(perfd, aes(x= x, y=y)) + geom_line(color = "orange",size = 1.5) +
   xlab("False positive rate") + ylab("True positive rate") +
-  ggtitle(paste("Area under the curve:", round(auc@y.values[[1]], 3)))
+  ggtitle(paste("Area under the curve:", round(auc@y.values[[1]], 3))) + 
+  geom_abline(intercept = 0, slope = 1,color = "blue", linetype = 2)
 
 ```
+
+```{r}
+round(coef(model3),2)
+round(exp(coef(model3)),2)
+co <- rbind(round(coef(model3),2),round(exp(coef(model3)),2))
+row.names(co) <- c("coefficients","exp(coefficients)")
+
+
+
+co %>%
+  knitr::kable(caption = '\\label{tab:summaries} Regression coefficients and exponentiated coefficients.', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+
+```
+
+```{r}
+plot_model(model3, show.values = TRUE,
+           title = "Log-Odds", show.p = FALSE)
+```
+
 
 
 ```{r, eval=FALSE}
