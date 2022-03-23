@@ -430,6 +430,13 @@ qchisq(df = 1, p = 0.95)
 summary(model3)
 ```
 
+$$ Qualityclass \sim Harvested_{\mbox{year}} - 1$$
+
+$$ Qualityclass \sim Altitude_{\mbox{level}} - 1 $$
+
+$$ Qualityclass \sim Origin_{\mbox{country}} - 1 $$
+
+
 $$\ln(\frac{p_i}{1-p_i}) = \alpha + \beta_1 \cdot aroma_i+ \beta_2 \cdot flavor_i+ \beta_3 \cdot acidity_i+ \beta_4 \cdot \mathbb{I}_{\mbox{Colombia}}(x)+ \beta_5 \cdot \mathbb{I}_{\mbox{Mexico}}(x)$$
 
 $$\mathbb{I}_{\mbox{Colombia}}(x)=\left\{ \begin{array}{ll} 1 ~~~ \mbox{if Country of region of} ~ x \mbox{th observation is Colombia},\\ 0 ~~~ \mbox{Otherwise}.\\ \end{array} \right. $$
