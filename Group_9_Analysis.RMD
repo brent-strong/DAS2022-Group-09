@@ -303,6 +303,22 @@ model_level <- glm(Qualityclass ~ level - 1, data = coffee_final,family = binomi
 summary(model_level)
 ```
 
+```{r}
+modelsumm <- summary(model_level)
+CI <- confint(model_level)
+citable <- data.frame(modelsumm$coefficients) %>%
+  round(2)
+colnames(citable)[1] <- "Estimate" 
+colnames(citable)[2] <- "Std error"
+colnames(citable)[3] <- "Statistics"
+colnames(citable)[4] <- "P_value"
+citable$Lower_ci <- CI[,1]
+citable$Upper_ci <- CI[,2]
+citable <- citable[,-3]
+knitr::kable(citable, caption = 'confidence interval of estimated parameters', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+```
+
 If the level of altitude is the only explanatory variable in the model, the effect of three levels are all statistically significant. In detail, high altitude has a positive influence on the quality of coffee.
 
 Secondly, we fit a model using harvested year as the only explanatory variable.
@@ -319,6 +335,24 @@ coffee_final$year2011 <- ifelse(coffee_final$year == 2011,1,0)
 coffee_final$year2012 <- ifelse(coffee_final$year == 2012,1,0)
 ```
 
+```{r}
+modelsumm <- summary(model_year)
+CI <- confint(model_year)
+citable <- data.frame(modelsumm$coefficients) %>%
+  round(2)
+colnames(citable)[1] <- "Estimate" 
+colnames(citable)[2] <- "Std error"
+colnames(citable)[3] <- "Statistics"
+colnames(citable)[4] <- "P_value"
+citable$Lower_ci <- CI[,1]
+citable$Upper_ci <- CI[,2]
+citable <- citable[,-3]
+citable <- citable %>%
+  filter(P_value < 0.05)
+knitr::kable(citable, caption = 'confidence interval of estimated parameters', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+```
+
 If harvested year is the only explanatory variable in the model, the effects of year 2010, 2011 and 2012 are statistically significant. Coffee harvested in year 2012 has a higher odds ratio. Coffee harvested in year 2010 and 2011 has a lower odds ratio.
 
 Then, we fit a model using country of region as the only explanatory variable.
@@ -328,6 +362,24 @@ Then, we fit a model using country of region as the only explanatory variable.
 
 model_country <- glm(Qualityclass ~ country_of_origin - 1, data = coffee_final,family = binomial(link = "logit"))
 summary(model_country)
+```
+
+```{r}
+modelsumm <- summary(model_country)
+CI <- confint(model_country)
+citable <- data.frame(modelsumm$coefficients) %>%
+  round(2)
+colnames(citable)[1] <- "Estimate" 
+colnames(citable)[2] <- "Std error"
+colnames(citable)[3] <- "Statistics"
+colnames(citable)[4] <- "P_value"
+citable$Lower_ci <- CI[,1]
+citable$Upper_ci <- CI[,2]
+citable <- citable[,-3]
+citable <- citable %>%
+  filter(P_value < 0.05)
+knitr::kable(citable, caption = 'confidence interval of estimated parameters', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
 If the country of origin is the only explanatory variable, Colombia, Mexico, Honduras, Kenya, Malawi, Uganda have statistically significant effect on the odds ratio.
