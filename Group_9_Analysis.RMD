@@ -470,7 +470,7 @@ co %>%
 
 ```{r}
 plot_model(model3, show.values = TRUE,
-           title = "Log-Odds", show.p = FALSE)
+           title = "Odds", show.p = FALSE)
 ```
 
 
