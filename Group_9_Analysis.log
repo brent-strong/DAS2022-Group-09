@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.3.22)  23 MAR 2022 14:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2022/dev) (preloaded format=pdflatex 2022.3.22)  23 MAR 2022 15:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -538,122 +538,117 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 86.
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 95.
+(Font)              <9> on input line 97.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 95.
-<Group_9_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf, id=20, 433.62pt x 325.215pt>
-File: Group_9_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (type pdf)
-<use Group_9_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf>
-Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf  used on input line 116.
-(pdftex.def)             Requested size: 433.63878pt x 325.22908pt.
+(Font)              <5> on input line 97.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 120.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 120.
 [1
 
 {/Users/ley/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.122 
+l.161 
       ]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 166.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 166.
-
-Overfull \hbox (13.99513pt too wide) in paragraph at lines 166--184
+<Group_9_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf, id=32, 433.62pt x 325.215pt>
+File: Group_9_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (type pdf)
+<use Group_9_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf>
+Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf  used on input line 168.
+(pdftex.def)             Requested size: 433.63878pt x 325.22908pt.
+[2pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.174 
+      ]
+Overfull \hbox (13.99513pt too wide) in paragraph at lines 218--236
  [][] 
  []
 
-[2pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
+[3pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.185 
-      pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has been already used, duplicate ignored
+l.237 
+      pdfTeX warning (ext4): destination with the same identifier (name{table.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.185 
+l.237 
        <./Group_9_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf>]
-<Group_9_Analysis_files/figure-latex/altitude-1.pdf, id=45, 939.51pt x 325.215pt>
-File: Group_9_Analysis_files/figure-latex/altitude-1.pdf Graphic file (type pdf)
-<use Group_9_Analysis_files/figure-latex/altitude-1.pdf>
-Package pdftex.def Info: Group_9_Analysis_files/figure-latex/altitude-1.pdf  used on input line 188.
+<Group_9_Analysis_files/figure-latex/unnamed-chunk-6-1.pdf, id=50, 939.51pt x 325.215pt>
+File: Group_9_Analysis_files/figure-latex/unnamed-chunk-6-1.pdf Graphic file (type pdf)
+<use Group_9_Analysis_files/figure-latex/unnamed-chunk-6-1.pdf>
+Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-6-1.pdf  used on input line 240.
 (pdftex.def)             Requested size: 469.75385pt x 162.6071pt.
-<Group_9_Analysis_files/figure-latex/altitude3-1.pdf, id=46, 939.51pt x 325.215pt>
+<Group_9_Analysis_files/figure-latex/altitude3-1.pdf, id=51, 939.51pt x 325.215pt>
 File: Group_9_Analysis_files/figure-latex/altitude3-1.pdf Graphic file (type pdf)
 <use Group_9_Analysis_files/figure-latex/altitude3-1.pdf>
-Package pdftex.def Info: Group_9_Analysis_files/figure-latex/altitude3-1.pdf  used on input line 201.
+Package pdftex.def Info: Group_9_Analysis_files/figure-latex/altitude3-1.pdf  used on input line 253.
 (pdftex.def)             Requested size: 469.75385pt x 162.6071pt.
-[3pdfTeX warning (ext4): destination with the same identifier (name{table.3}) has been already used, duplicate ignored
+[4pdfTeX warning (ext4): destination with the same identifier (name{table.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.210 
+l.262 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.210 
+l.262 
       pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.210 
-       <./Group_9_Analysis_files/figure-latex/altitude-1.pdf> <./Group_9_Analysis_files/figure-latex/altitude3-1.pdf>]
-<Group_9_Analysis_files/figure-latex/altitude4-1.pdf, id=64, 939.51pt x 325.215pt>
+l.262 
+       <./Group_9_Analysis_files/figure-latex/unnamed-chunk-6-1.pdf> <./Group_9_Analysis_files/figure-latex/altitude3-1.pdf>]
+<Group_9_Analysis_files/figure-latex/altitude4-1.pdf, id=69, 939.51pt x 325.215pt>
 File: Group_9_Analysis_files/figure-latex/altitude4-1.pdf Graphic file (type pdf)
 <use Group_9_Analysis_files/figure-latex/altitude4-1.pdf>
-Package pdftex.def Info: Group_9_Analysis_files/figure-latex/altitude4-1.pdf  used on input line 213.
+Package pdftex.def Info: Group_9_Analysis_files/figure-latex/altitude4-1.pdf  used on input line 265.
 (pdftex.def)             Requested size: 469.75385pt x 162.6071pt.
-<Group_9_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf, id=65, 939.51pt x 325.215pt>
+<Group_9_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf, id=70, 939.51pt x 325.215pt>
 File: Group_9_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf Graphic file (type pdf)
 <use Group_9_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf>
-Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf  used on input line 254.
+Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf  used on input line 306.
 (pdftex.def)             Requested size: 469.75385pt x 162.6071pt.
-[4pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has been already used, duplicate ignored
+[5pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.260 
-      pdfTeX warning (ext4): destination with the same identifier (name{table.4}) has been already used, duplicate ignored
+l.312 
+      pdfTeX warning (ext4): destination with the same identifier (name{table.5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.260 
+l.312 
        <./Group_9_Analysis_files/figure-latex/altitude4-1.pdf>]
-<Group_9_Analysis_files/figure-latex/unnamed-chunk-10-1.pdf, id=77, 939.51pt x 325.215pt>
-File: Group_9_Analysis_files/figure-latex/unnamed-chunk-10-1.pdf Graphic file (type pdf)
-<use Group_9_Analysis_files/figure-latex/unnamed-chunk-10-1.pdf>
-Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-10-1.pdf  used on input line 263.
-(pdftex.def)             Requested size: 469.75385pt x 162.6071pt.
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 274.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 320.
 (/Users/ley/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [5pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has been already used, duplicate ignored
+) [6pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.298 \end{verbatim}
-                    pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.298 \end{verbatim}
-                     <./Group_9_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf> <./Group_9_Analysis_files/figure-latex/unnamed-chunk-10-1.pdf>] [6] [7] [8] [9] [10] [11] [12] [13] [14] [15]
-Overfull \hbox (35.57945pt too wide) in paragraph at lines 888--900
+l.383 \end{verbatim}
+                     <./Group_9_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf>] [7] [8] [9] [10] [11] [12] [13] [14]
+Overfull \hbox (45.6626pt too wide) in paragraph at lines 843--855
  [][] 
  []
 
-<Group_9_Analysis_files/figure-latex/unnamed-chunk-34-1.pdf, id=139, 469.755pt x 325.215pt>
-File: Group_9_Analysis_files/figure-latex/unnamed-chunk-34-1.pdf Graphic file (type pdf)
-<use Group_9_Analysis_files/figure-latex/unnamed-chunk-34-1.pdf>
-Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-34-1.pdf  used on input line 924.
+<Group_9_Analysis_files/figure-latex/unnamed-chunk-18-1.pdf, id=129, 469.755pt x 325.215pt>
+File: Group_9_Analysis_files/figure-latex/unnamed-chunk-18-1.pdf Graphic file (type pdf)
+<use Group_9_Analysis_files/figure-latex/unnamed-chunk-18-1.pdf>
+Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-18-1.pdf  used on input line 879.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[16pdfTeX warning (ext4): destination with the same identifier (name{table.5}) has been already used, duplicate ignored
+[15pdfTeX warning (ext4): destination with the same identifier (name{table.6}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.926 \begin{verbatim}
+l.881 \begin{verbatim}
                       ]
-<Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf, id=153, 469.755pt x 325.215pt>
-File: Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf Graphic file (type pdf)
-<use Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf>
-Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf  used on input line 951.
+<Group_9_Analysis_files/figure-latex/unnamed-chunk-20-1.pdf, id=143, 469.755pt x 325.215pt>
+File: Group_9_Analysis_files/figure-latex/unnamed-chunk-20-1.pdf Graphic file (type pdf)
+<use Group_9_Analysis_files/figure-latex/unnamed-chunk-20-1.pdf>
+Package pdftex.def Info: Group_9_Analysis_files/figure-latex/unnamed-chunk-20-1.pdf  used on input line 906.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[17pdfTeX warning (ext4): destination with the same identifier (name{table.6}) has been already used, duplicate ignored
+[16pdfTeX warning (ext4): destination with the same identifier (name{table.7}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.953 \begin{verbatim}
-                       <./Group_9_Analysis_files/figure-latex/unnamed-chunk-34-1.pdf>] [18 <./Group_9_Analysis_files/figure-latex/unnamed-chunk-36-1.pdf>] (./Group_9_Analysis.aux)
+l.908 \begin{verbatim}
+                       <./Group_9_Analysis_files/figure-latex/unnamed-chunk-18-1.pdf>] [17 <./Group_9_Analysis_files/figure-latex/unnamed-chunk-20-1.pdf>] (./Group_9_Analysis.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
@@ -661,18 +656,18 @@ Package rerunfilecheck Info: File `Group_9_Analysis.out' has not changed.
 (rerunfilecheck)             Checksum: D9672CEF85C7348A874EB6DEA6D15E87;710.
  ) 
 Here is how much of TeX's memory you used:
- 12323 strings out of 480236
- 196135 string characters out of 5895197
- 493809 words of memory out of 5000000
- 29994 multiletter control sequences out of 15000+600000
+ 12314 strings out of 480236
+ 195668 string characters out of 5895197
+ 493913 words of memory out of 5000000
+ 29987 multiletter control sequences out of 15000+600000
  521977 words of font info for 74 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 60i,9n,63p,313b,469s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 60i,9n,63p,313b,468s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/Users/ley/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/Users/ley/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/Users/ley/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/Users/ley/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/Users/ley/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}</Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/ley/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Group_9_Analysis.pdf (18 pages, 326547 bytes).
+Output written on Group_9_Analysis.pdf (17 pages, 320558 bytes).
 PDF statistics:
- 248 PDF objects out of 1000 (max. 8388607)
- 183 compressed objects within 2 object streams
- 39 named destinations out of 1000 (max. 500000)
- 73 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 238 PDF objects out of 1000 (max. 8388607)
+ 176 compressed objects within 2 object streams
+ 38 named destinations out of 1000 (max. 500000)
+ 68 words of extra memory for PDF output out of 10000 (max. 10000000)
 
