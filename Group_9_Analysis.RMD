@@ -518,6 +518,18 @@ citable <- citable[,-3]
 knitr::kable(citable, caption = '\\label{tab:ci} confidence interval of estimated parameters', booktabs = TRUE, linesep = "", digits = 2) %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
+```{r}
+
+#Create table with confidence intervals for each of the estimates from the final model.
+citable$Lower_ci <- CI[,1]
+citable$Upper_ci <- CI[,2]
+citable$Exp_lower_ci <- exp(citable$Lower_ci)
+citable$Exp_upper_ci <- exp(citable$Upper_ci)
+
+knitr::kable(citable[,6:7], caption = '\\label{tab:ci} confidence interval of odds', booktabs = TRUE, linesep = "", digits = 2) %>%
+  kable_styling(font_size = 10, latex_options = "HOLD_position")
+```
+
 
 Based on the model we built, we try to use 10-fold cross validation to test the validity of our final model. In the validation we assess three criteria: accuracy, sensitivity and specificity.
 
