@@ -526,7 +526,7 @@ citable$Upper_ci <- CI[,2]
 citable$Exp_lower_ci <- exp(citable$Lower_ci)
 citable$Exp_upper_ci <- exp(citable$Upper_ci)
 
-knitr::kable(citable[,6:7], caption = '\\label{tab:ci} confidence interval of odds', booktabs = TRUE, linesep = "", digits = 2) %>%
+knitr::kable(citable[,6:7], caption = '\\label{tab:ciodds} confidence interval of odds', booktabs = TRUE, linesep = "", digits = 2) %>%
   kable_styling(font_size = 10, latex_options = "HOLD_position")
 ```
 
